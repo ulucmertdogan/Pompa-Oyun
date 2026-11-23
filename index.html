@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yeşil Pompa</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Yeşil Pompa">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cheerful cartoon tycoon, sticker-book warmth, a bit silly like its boss
+   IDEA: a toy factory diorama on a desk; the boss Mr. Necmi waves from the yard
+   PICTURE: the factory scene with conveyor of green pumps and Mr. Necmi, tap it to produce
+   COLOUR and TYPE: fire-pump red lead, sunflower yellow support, deep ink; Baloo 2 + Nunito
+   LAYOUT: one phone column: money, scene, tap button, order card, tabs with upgrade lists */
+:root{color-scheme:light dark;
+--bg:light-dark(#fff4e2,#16110d);--ink:light-dark(#2b1d14,#f7ead9);--mute:light-dark(#7d6352,#b9a08c);
+--card:light-dark(#ffffff,#241b15);--line:light-dark(#f0dcc2,#3a2c22);--red:#e0342b;--yel:#ffc23d;
+--sky1:light-dark(#ffcf6e,#2b2350);--sky2:light-dark(#fff0cf,#5a3f63);--ground:light-dark(#e8b15a,#4b3424);--hall:light-dark(#c9503a,#8e3a2b);--roof:light-dark(#7b2e22,#4c1d16)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Nunito,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+main{max-width:520px;margin:0 auto;padding:14px max(4vw,12px) 40px;display:flex;flex-direction:column;gap:12px}
+h1,h2,.big{font-family:"Baloo 2",sans-serif}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+h1{font-size:clamp(22px,6.5vw,30px);line-height:1;margin:0;color:var(--red);font-weight:800}
+.stage{font-size:13px;color:var(--mute);font-weight:700}
+.money{text-align:right}
+.big{font-size:clamp(28px,8vw,38px);font-weight:800;line-height:1;white-space:nowrap}
+.rate{font-size:13px;color:var(--mute)}
+.prog{height:8px;border-radius:9px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;background:var(--yel);border-radius:9px;transition:width .3s}
+.plabel{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-top:4px}
+.scene{position:relative;aspect-ratio:360/215;border-radius:22px;overflow:hidden;box-shadow:0 6px 0 var(--line);cursor:pointer;touch-action:manipulation}
+.scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.smoke{animation:smoke 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes smoke{from{transform:translateY(0) scale(.6);opacity:.8}to{transform:translateY(-30px) scale(1.6);opacity:0}}
+.belt{animation:belt 2s linear infinite}
+@keyframes belt{to{transform:translateX(70px)}}
+.bob{animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-2px)}}
+.jump{animation:jump .45s ease-out}
+.bigp{transform-box:fill-box;transform-origin:50% 100%}.bigp.pulse{animation:pulse .22s ease-out}
+@keyframes pulse{50%{transform:scale(1.08,.94)}}
+.tap{display:flex;align-items:center;justify-content:center;gap:10px}.tap svg{width:46px;height:28px;flex:none}
+@keyframes jump{40%{transform:translateY(-14px)}}
+.wave{transform-box:fill-box;transform-origin:10% 90%;animation:wave 1.4s ease-in-out infinite}
+@keyframes wave{50%{transform:rotate(-18deg)}}
+.boostTag{position:absolute;left:10px;top:10px;background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:4px 10px;border-radius:99px;display:none}
+.float{position:absolute;pointer-events:none;font:800 18px "Baloo 2",sans-serif;color:#fff;-webkit-text-stroke:1px #7b2e22;text-shadow:0 2px 0 #7b2e22;animation:fl .8s ease-out forwards;white-space:nowrap}
+@keyframes fl{to{transform:translateY(-50px);opacity:0}}
+.bubble{position:absolute;right:30%;top:6%;max-width:62%;background:#fff;color:#2b1d14;border-radius:16px;padding:10px 12px;font-size:14px;font-weight:700;box-shadow:0 4px 0 #0002;display:none;cursor:default}
+.bubble::after{content:"";position:absolute;right:-9px;bottom:16px;border:9px solid transparent;border-left-color:#fff;border-right:0}
+.bubble.on{display:block;animation:pop .25s ease-out}
+.bubble button{margin-top:8px;min-height:38px;font-size:14px;padding:0 14px}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+button{font:800 16px Nunito,sans-serif;border:0;border-radius:14px;min-height:46px;padding:0 14px;cursor:pointer;touch-action:manipulation;background:var(--red);color:#fff;box-shadow:inset 0 -4px 0 #0003;white-space:nowrap}
+button:active{transform:translateY(2px)}
+button:disabled{background:var(--line);color:var(--mute);box-shadow:none;transform:none}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.tap{min-height:58px;font-size:20px;font-family:"Baloo 2";background:var(--yel);color:#2b1d14}
+.order{background:var(--card);border:2px dashed var(--red);border-radius:18px;padding:12px 14px;display:none}
+.order.on{display:block}
+.order b{color:var(--red)}
+.order .row{display:flex;justify-content:space-between;font-size:14px;color:var(--mute);margin:4px 0 6px}
+.tabs{display:flex;background:var(--line);border-radius:14px;padding:4px;gap:4px}
+.tabs button{flex:1 1 0;background:transparent;color:var(--mute);box-shadow:none;min-height:42px;padding:0 2px;font-size:13px}
+.tabs button.on{background:var(--card);color:var(--ink)}
+.mult{display:flex;justify-content:flex-end;gap:6px;font-size:14px;color:var(--mute);align-items:center}
+.mult button{min-height:34px;padding:0 12px;font-size:14px;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 2px var(--line)}
+.mult button.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--card);border-radius:18px;padding:12px;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;box-shadow:0 3px 0 var(--line)}
+.item.locked{opacity:.55}
+.badge{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font:800 18px "Baloo 2";color:#fff}
+.item h3{margin:0;font-size:16px;line-height:1.2}
+.item p{margin:2px 0 0;font-size:13px;color:var(--mute)}
+.item .mini{height:5px;border-radius:5px;background:var(--line);margin-top:6px;overflow:hidden}.item .mini i{display:block;height:100%;background:var(--yel)}
+.item button{min-width:96px;font-size:15px}
+.pico{width:48px;height:48px;border-radius:14px;background:light-dark(#e6f6ec,#173326);display:grid;place-items:center}.pico svg{width:44px;height:40px}
+.ach .badge{background:var(--line);color:var(--mute)}.ach.got .badge{background:var(--yel);color:#2b1d14}
+.toast{position:fixed;left:50%;top:12px;transform:translate(-50%,-140%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-weight:800;font-size:14px;z-index:20;transition:transform .35s;max-width:92vw;text-align:center}.toast.on{transform:translate(-50%,0)}
+.opts{display:flex;gap:8px;justify-content:flex-end}.opts button{min-height:34px;font-size:13px;padding:0 12px;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 2px var(--line)}.opts button.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.fair{border-color:var(--yel);background:light-dark(#fff8e0,#2a2312)}.fair button{margin-top:6px;background:var(--yel);color:#2b1d14}
+.game{position:fixed;inset:0;z-index:15;background:#2b1d14f2;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px}.game.on{display:flex}
+.ghead{display:flex;justify-content:space-between;align-items:center;width:min(92vw,420px);color:#fff}.ghead b{display:block;font:800 28px "Baloo 2";color:var(--yel);line-height:1}.ghead span{font-size:15px}
+.gtime{font:800 40px "Baloo 2";color:#fff;min-width:60px;text-align:right}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(92vw,420px)}
+.booth{aspect-ratio:1;border-radius:18px;background:#4a3426;box-shadow:inset 0 -8px 0 #0004;display:grid;place-items:center;min-height:0;padding:0;position:relative;overflow:hidden}
+.booth::before{content:"";position:absolute;left:0;right:0;top:0;height:16%;background:repeating-linear-gradient(90deg,#e0342b 0 14px,#fff 14px 28px)}
+.booth svg{width:76%;height:76%;animation:pop .15s ease-out}.booth.spy{background:#3a1a1a}.booth.hit{background:#2f9e5b}.booth.bad{background:#e0342b}
+.ipo{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 3px 0 var(--line);display:flex;flex-direction:column;gap:10px}
+.ipo .k{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ipo .k div{background:var(--line);border-radius:14px;padding:10px}.ipo .k b{display:block;font:800 26px "Baloo 2";line-height:1.1}.ipo .k small{color:var(--mute);font-size:13px}
+.ipo p{margin:0;color:var(--mute);font-size:14px}
+.mor,.tasks{background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:0 3px 0 var(--line)}
+.box2 summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;min-height:30px}.box2 summary::-webkit-details-marker{display:none}
+.box2 summary::after{content:"";width:8px;height:8px;border-right:2.5px solid var(--mute);border-bottom:2.5px solid var(--mute);transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .2s;flex:none}
+.box2[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.box2 summary b{flex:none}.box2 .sm{font-size:13px;color:var(--mute);white-space:nowrap;margin-left:auto}.box2 summary .mbar{flex:1;margin:0}
+.box2 .sm.hot{color:#fff;background:#2f9e5b;padding:2px 10px;border-radius:99px;font-weight:800}
+.box2 .sub{font-size:13px;color:var(--mute);margin:8px 0}
+.mrow{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}.mrow span{font-size:13px;color:var(--mute)}
+.mbar{margin:8px 0 10px;height:10px}.mbar i{transition:width .4s,background .4s}
+.mbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mbtns button{min-height:52px;font-size:13px;line-height:1.2;white-space:normal;padding:4px 6px;background:var(--line);color:var(--ink);box-shadow:inset 0 -3px 0 #0001}
+.mbtns button small{display:block;font-weight:700;color:var(--mute);font-size:12px}.mbtns button:disabled{opacity:.5}
+.tasks h3{margin:0;font-size:17px}.tasks .sub{font-size:13px;color:var(--mute);margin:0 0 8px}
+.task{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.task .tt{font-weight:800;font-size:15px}.task .tp{grid-column:1;font-size:12px;color:var(--mute)}.task .prog{grid-column:1;height:6px}
+.task button{grid-row:1/4;grid-column:2;min-height:40px;font-size:14px;background:#2f9e5b}.task button:disabled{background:var(--line)}.task.got .tt{text-decoration:line-through;color:var(--mute)}
+.sec{margin:6px 0 0;font-size:17px}.sec small{font-size:13px;color:var(--mute);font-weight:400;margin-left:6px}
+.ward h3{margin:0;font-size:17px}.wgrid{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:start}.prev{width:96px;height:156px;background:light-dark(#fff0cf,#2b2350);border-radius:14px}
+.slot h4{margin:0 0 4px;font-size:13px;color:var(--mute)}.slot+.slot{margin-top:8px}.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:36px;font-size:13px;padding:4px 10px;background:var(--line);color:var(--ink);box-shadow:none;white-space:normal;line-height:1.2;text-align:left}.chip.on{background:#2f9e5b;color:#fff}.chip small{display:block;font-weight:700;font-size:11px}
+.spray{animation:spray 1s ease-in-out infinite}@keyframes spray{50%{opacity:.4}}
+@media(max-width:360px){.wgrid{grid-template-columns:72px minmax(0,1fr)}.prev{width:72px;height:118px}}
+.box.sbox{text-align:left}.sbox .sb p{text-align:left;color:var(--ink);margin:2px 0 0}.ch{font-weight:800;font-size:13px;color:var(--mute)}.sbox h2{margin:2px 0 12px}
+.line{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:start;min-height:120px}.av{width:64px;height:84px;display:grid;place-items:center}.av svg{width:64px;height:84px}
+.sb{background:var(--line);border-radius:4px 16px 16px 16px;padding:10px 12px}.sb b{font-size:14px;color:var(--red)}.sb p{margin:2px 0 0;color:var(--ink);font-size:15px;animation:pop .25s ease-out}
+.snav{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--mute);font-size:13px}
+.stories{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.hired{font-weight:800;color:#2f9e5b;font-size:14px;text-align:right}
+.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal.on{display:flex}
+.box{background:var(--card);border-radius:24px;padding:20px;max-width:360px;width:100%;text-align:center;animation:pop .3s ease-out}
+.box h2{margin:6px 0;font-size:28px;line-height:1.1;color:var(--red)}
+.box p{margin:0 0 14px;color:var(--mute)}
+.foot{text-align:center;margin-top:10px}
+.foot button{background:transparent;color:var(--mute);box-shadow:none;font-size:14px;min-height:40px;text-decoration:underline}
+.note{font-size:13px;color:var(--mute);text-align:center;margin:0}
+@media(prefers-reduced-motion:reduce){.bigp.pulse,.smoke,.belt,.bob,.wave,.jump,.float,.bubble.on,.box{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div><h1>Yeşil Pompa Inc.</h1><div class="stage" id="stage">Workshop</div></div>
+    <div class="money"><div class="big" id="money">₺0</div><div class="rate" id="rate">0 pumps/s</div></div>
+  </div>
+  <div><div class="prog"><i id="prog"></i></div><div class="plabel"><span id="plab">Next: Factory</span><span id="ppct">%0</span></div></div>
+
+
+  <div class="scene" id="scene" aria-label="Tap the factory to build pumps">
+    <svg viewBox="0 0 360 215" id="svg"></svg>
+    <div class="boostTag" id="boostTag"></div>
+    <div class="bubble" id="bubble"><div id="btxt"></div><button id="bbtn">OK</button></div>
+  </div>
+  <button class="tap" id="tap">Build pump</button>
+
+  <details class="mor box2" id="morBox" style="display:none">
+    <summary><b>Team morale</b><span class="prog mbar"><i id="morBar"></i></span><span class="sm" id="morLab">80%</span></summary>
+    <p class="sub">Happy staff (80%+) build 25% faster. Morale slowly drops but never below 50%.</p>
+    <div class="mbtns"><button data-mor="0"></button><button data-mor="1"></button><button data-mor="2"></button></div>
+  </details>
+
+  <div class="order" id="order">
+    <div><b id="oName">Order</b></div>
+    <div class="row"><span id="oProg">0 / 0 pumps</span><span id="oTime">60 s</span></div>
+    <div class="prog"><i id="oBar"></i></div>
+    <div class="plabel"><span>Reward</span><span id="oRew">₺0</span></div>
+  </div>
+
+  <details class="tasks box2" id="tasksBox" style="display:none">
+    <summary><b>Today's tasks</b><span class="sm" id="tSum">0 / 3</span></summary>
+    <div id="tasks"></div>
+  </details>
+
+  <div class="order fair" id="fair">
+    <div><b>The trade fair is open!</b></div>
+    <div class="row"><span>Tap customers at your booth for big deals.</span><span id="fTime">25 s</span></div>
+    <button id="fJoin" style="width:100%">Join the fair</button>
+  </div>
+
+  <div class="tabs"><button class="on" data-tab="d">Depts</button><button data-tab="e">Staff</button><button data-tab="p">Pumps</button><button data-tab="s">Style</button><button data-tab="a">Badges</button><button data-tab="i">IPO</button></div>
+  <p class="note" id="tabNote" style="display:none"></p>
+  <div class="mult" id="multBox">Buy: <button class="on" data-m="1">×1</button><button data-m="10">×10</button></div>
+  <div class="list" id="list"></div>
+  <p class="note">The factory keeps running while the app is closed (up to 8 hours, 24 with IT Metin).</p>
+  <div class="opts" style="justify-content:center"><button id="sndB">Sound: on</button><button id="musB">Music: off</button></div>
+  <div class="foot"><button id="reset">Reset game</button></div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="story"><div class="box sbox"><div class="ch" id="sCh">Chapter 1</div><h2 id="sT">Title</h2>
+  <div class="line"><div class="av" id="sAv"></div><div class="sb"><b id="sWho">Mr. Necmi</b><p id="sTx"></p></div></div>
+  <div class="snav"><span id="sPg">1 / 3</span><button id="sNext">Next</button></div></div></div>
+<div class="game" id="game"><div class="ghead"><div><b>Trade Fair</b><span id="gInfo">Deals: 0</span></div><div class="gtime" id="gTime">15</div></div>
+  <div class="grid" id="grid"></div><p class="note" style="color:#fff">Tap the customers. Avoid the rival's spies in sunglasses!</p></div>
+<div class="modal" id="modal"><div class="box">
+  <svg viewBox="-50 -158 100 163" width="110" height="170" id="mNec"></svg>
+  <h2 id="mT">Welcome!</h2><p id="mP"></p><button id="mB">Great</button>
+</div></div>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const DEPTS=[
+ {n:'Foundry',d:'Casting casings and impellers',c:150,r:.2,col:'#e0342b'},
+ {n:'Machining',d:'Lathes and milling machines',c:1500,r:1.5,col:'#f08a24'},
+ {n:'Assembly Line',d:'Motor meets pump',c:18000,r:10,col:'#d4a017'},
+ {n:'Test Bench',d:'Pressure and flow testing',c:250000,r:60,col:'#2f9e5b'},
+ {n:'Shipping',d:'The truck fleet hits the road',c:4e6,r:350,col:'#2b6cb0'},
+ {n:'Global Dealer Network',d:'Sales on five continents',c:7e7,r:2000,col:'#7b3fa0'}];
+const EMPS=[
+ {n:'Foreman Rıza',d:'Tap power ×5',c:3000,k:'tap',v:5,f:{s:'#e3a77d',h:'#3b2a20',t:'cap',m:1}},
+ {n:'Test Engineer Selin',d:'All production ×1.5',c:50000,k:'prod',v:1.5,f:{s:'#f1c6a4',h:'#7a3b1e',t:'long',g:1}},
+ {n:'Sales Rep Burak',d:'Pump sale price ×1.5',c:400000,k:'price',v:1.5,f:{s:'#c98d63',h:'#1d1d1d',t:'short'}},
+ {n:'Accountant Gülten',d:'Offline earnings 50% → 100%',c:3e6,k:'off',v:1,f:{s:'#f3c9a8',h:'#9a9a9a',t:'bun',g:1}},
+ {n:'R&D Engineer Kaan',d:'All production ×2',c:5e7,k:'prod',v:2,f:{s:'#dcae88',h:'#5b3a1f',t:'short',g:1}},
+ {n:'Export Manager Deniz',d:'Sale price ×2',c:2e9,k:'price',v:2,f:{s:'#b97d55',h:'#2a1a10',t:'long'}},
+ {n:'IT Metin',d:'Keeps the servers up: offline earnings last 24 hours instead of 8',c:6e5,k:'offcap',v:1,f:{s:'#e0b089',h:'#2a1a10',t:'short',g:1,hs:1}},
+ {n:'Loveyar Begüm',d:'Company lawyer. Airtight contracts: order rewards ×2',c:2e7,k:'order',v:2,f:{s:'#f1c6a4',h:'#3b2416',t:'long',law:1}}];
+const G='#2f9e5b',D='#1f6e40',L='#7fd6a1';
+const P_IN=`<rect x="10" y="-6" width="70" height="6" rx="2" fill="#3d4a44"/><rect x="4" y="-26" width="16" height="12" fill="${G}"/><rect x="0" y="-30" width="5" height="20" rx="1.5" fill="${D}"/><rect x="70" y="-26" width="16" height="12" fill="${G}"/><rect x="85" y="-30" width="5" height="20" rx="1.5" fill="${D}"/><ellipse cx="45" cy="-20" rx="26" ry="14" fill="${G}" stroke="${D}" stroke-width="2.5"/><rect x="38" y="-44" width="14" height="12" fill="#9aa3a0"/><rect x="28" y="-80" width="34" height="38" rx="6" fill="${G}"/><g stroke="${D}" stroke-width="2">${[-72,-65,-58,-51].map(y=>`<line x1="31" y1="${y}" x2="59" y2="${y}"/>`).join('')}</g><ellipse cx="45" cy="-80" rx="17" ry="4" fill="${D}"/>`;
+const P_DZ=`<rect x="-4" y="-6" width="98" height="6" rx="2" fill="#3d4a44"/><rect x="0" y="-42" width="18" height="36" rx="2" fill="${D}"/><g stroke="${L}" stroke-width="1.5" opacity=".7">${[-38,-33,-28,-23,-18,-13].map(y=>`<line x1="3" y1="${y}" x2="15" y2="${y}"/>`).join('')}</g><rect x="18" y="-36" width="36" height="30" rx="4" fill="${G}"/><rect x="22" y="-45" width="28" height="9" rx="2" fill="${D}"/><rect x="42" y="-60" width="5" height="16" fill="#555"/><rect x="23" y="-30" width="11" height="11" rx="2" fill="#4a4f55"/><rect x="54" y="-25" width="7" height="10" fill="#9aa3a0"/><rect x="68" y="-46" width="12" height="12" fill="${G}"/><rect x="65" y="-49" width="18" height="4" fill="${D}"/><circle cx="74" cy="-22" r="14" fill="${G}" stroke="${D}" stroke-width="2.5"/><circle cx="74" cy="-22" r="5" fill="${D}"/>`;
+const P_EL=`<rect x="-6" y="-6" width="102" height="6" rx="2" fill="#3d4a44"/><rect x="-2" y="-58" width="20" height="52" rx="3" fill="#4a4f55"/><rect x="1" y="-54" width="14" height="10" rx="1.5" fill="#1d2b25"/><circle cx="5" cy="-38" r="2.5" fill="${L}"/><circle cx="12" cy="-38" r="2.5" fill="#ffc23d"/><rect x="2" y="-30" width="12" height="2" fill="#7b2e22"/><rect x="2" y="-25" width="12" height="2" fill="#7b2e22"/>
+<rect x="22" y="-38" width="34" height="30" rx="6" fill="${G}"/><g stroke="${D}" stroke-width="2">${[28,34,40,46,52].map(x=>`<line x1="${x}" y1="-35" x2="${x}" y2="-11"/>`).join('')}</g><ellipse cx="23" cy="-23" rx="4" ry="14" fill="${D}"/><rect x="28" y="-46" width="14" height="8" rx="2" fill="${D}"/>
+<path d="M56 -30 h10 v14 h-10z" fill="#ffc23d" stroke="#c98a10" stroke-width="1.5"/><rect x="66" y="-36" width="26" height="26" rx="9" fill="${G}" stroke="${D}" stroke-width="2.5"/><rect x="64" y="-24" width="30" height="4" fill="${D}"/><rect x="73" y="-48" width="12" height="12" fill="${G}"/><rect x="70" y="-51" width="18" height="4" fill="${D}"/><rect x="72" y="-10" width="14" height="4" fill="${D}"/>`;
+const RF=x=>x.split('#2f9e5b').join('#d7263d').split('#1f6e40').join('#8e1626').split('#7fd6a1').join('#ff9aa5');
+const P_SB=`<rect x="28" y="-5" width="34" height="5" rx="2" fill="#3d4a44"/><rect x="34" y="-72" width="22" height="67" rx="10" fill="${G}"/><rect x="34" y="-44" width="22" height="10" fill="${D}"/><g stroke="${L}" stroke-width="1.5">${[38,42,46,50].map(x=>`<line x1="${x}" y1="-43" x2="${x}" y2="-35"/>`).join('')}</g><rect x="38" y="-68" width="5" height="22" rx="2" fill="${L}" opacity=".5"/><rect x="40" y="-84" width="10" height="13" fill="${D}"/><path d="M45 -84 q22 -12 34 8" stroke="#222" stroke-width="2.5" fill="none"/>`;
+const P_VT=`<rect x="6" y="-6" width="78" height="6" rx="2" fill="#3d4a44"/><path d="M20 -6 L70 -6 L61 -42 L29 -42Z" fill="${G}"/><rect x="62" y="-32" width="20" height="13" fill="${G}"/><rect x="80" y="-36" width="6" height="21" rx="1.5" fill="${D}"/><rect x="36" y="-50" width="18" height="8" fill="#9aa3a0"/><rect x="27" y="-90" width="36" height="40" rx="6" fill="${G}"/><g stroke="${D}" stroke-width="2">${[29,35,41,47,53,59].map(x=>`<line x1="${x+2}" y1="-86" x2="${x+2}" y2="-54"/>`).join('')}</g><ellipse cx="45" cy="-90" rx="18" ry="4" fill="${D}"/>`;
+const P_IOT=()=>PUMP+`<rect x="14" y="-66" width="26" height="18" rx="3" fill="#1d2b25"/><path d="M18 -54 l6 -5 l5 3 l6 -6" stroke="${L}" stroke-width="2" fill="none"/><line x1="27" y1="-48" x2="27" y2="-36" stroke="#555" stroke-width="2"/><g fill="none" stroke="${G}" stroke-width="2.5" stroke-linecap="round"><path d="M74 -70 q10 -9 20 0"/><path d="M78 -65 q6 -5 12 0"/></g><circle cx="84" cy="-61" r="2.5" fill="${G}"/>`;
+const PRODUCTS=[
+ {n:'Horizontal Centrifugal Pump',d:'Your first product. It all started here.',c:0,m:1,g:()=>PUMP},
+ {n:'Vertical Inline Pump',d:'Sale price ×1.5',c:30000,m:1.5,g:()=>P_IN},
+ {n:'Electric Fire Pump Set',d:'Sale price ×1.5',c:1e6,m:1.5,g:()=>RF(P_EL)},
+ {n:'Diesel Fire Pump Set',d:'Sale price ×2',c:3e7,m:2,g:()=>RF(P_DZ)},
+ {n:'Submersible Pump',d:'Sale price ×2',c:8e8,m:2,g:()=>P_SB},
+ {n:'Vertical Turbine Pump',d:'Sale price ×2',c:2e10,m:2,g:()=>P_VT},
+ {n:'Smart IoT Pump',d:'Sale price ×2.5',c:5e11,m:2.5,g:P_IOT}];
+const ACH=[
+ ['First pump','Build your first pump',()=>S.pumps>=1],['Mass production','Build 1,000 pumps',()=>S.pumps>=1e3],['Pump waterfall','Build 100K pumps',()=>S.pumps>=1e5],['Pump ocean','Build 10M pumps',()=>S.pumps>=1e7],
+ ['Tap master','Tap 500 times',()=>S.taps>=500],['First delivery','Complete 1 order',()=>S.done>=1],['Order monster','Complete 10 orders',()=>S.done>=10],
+ ['Necmi\'s buddy','Tap Mr. Necmi 20 times',()=>S.nt>=20],['Millionaire','Earn ₺1M in total',()=>S.life>=1e6],['Full team','Hire all staff',()=>S.emp.every(x=>x)],
+ ['Full catalog','Unlock every product',()=>S.prod.every(x=>x)],['Loyal employee','Play 7 days in a row',()=>S.dy.s>=7],['Global giant','Reach the final stage',()=>stageIdx()>=4],['Gone public','Complete your first IPO',()=>S.ipo>=1],['Fair star','Close 25 deals in one fair',()=>S.bestFair>=25],['Task master','Complete 10 daily tasks',()=>S.tdone>=10],['Happy team','Reach 100% morale',()=>S.mor>=100]];
+const STAGES=[[0,'Workshop'],[1e5,'Factory'],[1e8,'Regional Plant'],[1e11,'National Leader'],[1e13,'Global Giant']];
+const ORDERS=['Hotel project','Hospital','Shopping mall','Airport','Stadium','Data center','Logistics warehouse','University campus'];
+const QUOTES=["I'm not a boss, I'm a visionary.","Pumps push water, Necmi pushes profits!","This meeting could have been an email. But it wasn't.","There's no 'I' in team. But there is one in 'Necmi'.","I feel so productive today. Let's take a coffee break.","Like my tie? A gift for the world's best boss. From me.","Pressure? I shine under pressure. Just ask our pumps!"];
+const STAFF_EV=[
+ [6,'IT Metin: "Have you tried turning the factory off and on again?" It worked! Production ×2 for 30 seconds.','Thanks, Metin',()=>{boost(2,30)}],
+ [6,'IT Metin fixed the sales website. Orders are pouring in!','Nice',()=>{const g=Math.max(300,income()*60);gain(g);return '+'+fmtM(g)}],
+ [7,'Loveyar Begüm, our lawyer, found a late-payment clause. The client pays a penalty to us!','Collect',()=>{const g=Math.max(500,income()*90);gain(g);return '+'+fmtM(g)}],
+ [7,'Loveyar Begüm: "Mr. Necmi, you cannot sign contracts with a crayon." Fair point.','Noted',()=>{const g=Math.max(200,income()*30);gain(g);return '+'+fmtM(g)}]];
+const EVENTS=[
+ {t:'I played golf with a client and landed a big deal!',b:'Collect',f:()=>{const g=Math.max(200,income()*60);gain(g);return '+'+fmtM(g)}},
+ {t:'I held a motivation meeting! Everyone works twice as fast for 30 seconds.',b:'Awesome!',f:()=>{boost(2,30)}},
+ {t:'I bought cake for everyone! You pay the bill, but production is ×3 for 20 seconds.',b:'Okay...',f:()=>{S.money*=.95;boost(3,20)}},
+ {t:'I bought myself a "World\'s Best Boss" trophy. Celebration bonus!',b:'Congrats(!)',f:()=>{const g=Math.max(100,income()*25);gain(g);return '+'+fmtM(g)}},
+ {t:'I accidentally added an extra zero to the price list. Nobody noticed!',b:'Shhh...',f:()=>{const g=Math.max(300,income()*90);gain(g);return '+'+fmtM(g)}}];
+
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const fresh=()=>({money:0,life:0,pumps:0,lv:DEPTS.map(()=>0),emp:EMPS.map(()=>false),last:Date.now(),order:null,nextOrder:40,nextEvent:25,bx:1,bt:0,prod:PRODUCTS.map((_,i)=>i===0),ach:[],taps:0,nt:0,done:0,dy:{d:'',s:0},v:2,inv:0,ipo:0,snd:true,mus:false,nextFair:150,un:[],story:[],out:{hat:'none',glasses:'none',suit:'navy'},deco:[],oseen:[],mor:80,mc:[0,0,0],q:{d:'',l:[],all:false},earned:0,lb:0,fairs:0,mu:0,tdone:0});
+let S=fresh();
+try{const L=JSON.parse(store.get('pompaFab'));if(L&&Array.isArray(L.lv)){S=Object.assign(fresh(),L);S.v=2;S.lv=DEPTS.map((_,i)=>L.lv[i]||0);S.emp=EMPS.map((_,i)=>!!(L.emp||[])[i]);const op=L.prod||[];const mp=L.v>=2?op:[op[0],op[1],!!op[2],op[2],op[3],op[4],op[5]];S.prod=PRODUCTS.map((_,i)=>i===0||!!mp[i]);S.ach=Array.isArray(L.ach)?L.ach:[];S.dy=L.dy&&typeof L.dy==='object'?L.dy:{d:'',s:0};}}catch(e){}
+
+function fmt(n){if(n<1000)return (n<10&&n%1?n.toFixed(1):Math.floor(n)).toString();
+  const u=['K','M','B','T','Qa','Qi'];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}
+  return n.toLocaleString('en-US',{maximumFractionDigits:n<100?2:1})+u[i];}
+const fmtM=n=>'₺'+fmt(n);
+const effMul=k=>EMPS.reduce((m,e,i)=>S.emp[i]&&e.k===k?m*e.v:m,1);
+const tapPow=()=>effMul('tap');
+const prodMul=()=>PRODUCTS.reduce((m,p,i)=>S.prod[i]?m*p.m:m,1);
+const price=()=>10*effMul('price')*prodMul();
+const achMul=()=>(1+.05*S.ach.length)*(1+.1*S.inv)*(1+.03*(S.deco||[]).length);
+const invGain=()=>Math.floor(Math.sqrt(S.life/1e9));
+const offRate=()=>S.emp[3]?1:.5;
+const mile=l=>2**[25,50,100,200,300].filter(x=>l>=x).length;
+const nextMile=l=>[25,50,100,200,300].find(x=>l<x)||null;
+const deptRate=i=>S.lv[i]*DEPTS[i].r*mile(S.lv[i]);
+const baseRate=()=>DEPTS.reduce((s,_,i)=>s+deptRate(i),0)*effMul('prod')*achMul();
+const boosting=()=>S.bt>0;
+const morMul=()=>has('mor')&&S.mor>=80?1.25:1;
+const morName=()=>S.mor>=80?'Happy':'OK';
+const rate=()=>baseRate()*(boosting()?S.bx:1)*morMul();
+const income=()=>rate()*price();
+const cost=(i,n)=>DEPTS[i].c*1.17**S.lv[i]*(1.17**n-1)/.17;
+const stageIdx=()=>STAGES.reduce((a,s,i)=>S.life>=s[0]?i:a,0);
+
+let AC=null,mGain=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null}}if(AC.state==='suspended')AC.resume();return AC;}
+function tone(f,d,type,v,when,f2){const a=ac();if(!a)return;const t=a.currentTime+(when||0),o=a.createOscillator(),g=a.createGain();o.type=type||'triangle';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.12,t+(tone.att||.01));g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.02);}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+const SFX={tap:()=>tone(480+Math.random()*120,.09,'triangle',.1,0,260),buy:()=>{tone(660,.08,'square',.06);tone(990,.14,'square',.06,.07)},
+  badge:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.1,i*.08)),win:()=>[392,523,659,784,1047].forEach((f,i)=>tone(f,.22,'square',.06,i*.1)),
+  fail:()=>tone(320,.35,'sawtooth',.06,0,150),pop:()=>tone(880,.06,'sine',.08,0,1200),bad:()=>tone(180,.2,'square',.08)};
+function sfx(k,vib){if(!S.snd)return;SFX[k]();if(vib)buzz(vib);}
+let musT=0,beat=0;const MEL=[4,null,7,null,9,null,7,4,2,null,null,null,0,null,2,4,7,null,9,null,12,null,9,7,4,null,null,null,2,null,null,null],CH=[0,-3,-7,-5];
+function music(on){clearInterval(musT);if(!on)return;musT=setInterval(()=>{if(!S.mus||document.hidden)return;tone.att=.12;
+  const n=MEL[beat%32];if(n!==null&&Math.random()>.12)tone(262*2**(n/12),1.6,'sine',.028);
+  if(beat%8===0){const r=CH[(beat/8|0)%4];[0,7,16].forEach(k=>tone(131*2**((r+k)/12),4.2,'sine',.018));}
+  tone.att=.01;beat++;},560);}
+function optsUI(){$('sndB').textContent='Sound: '+(S.snd?'on':'off');$('sndB').classList.toggle('on',S.snd);$('musB').textContent='Music: '+(S.mus?'on':'off');$('musB').classList.toggle('on',S.mus);}
+$('sndB').addEventListener('click',()=>{S.snd=!S.snd;optsUI();if(S.snd)sfx('pop');save();});
+$('musB').addEventListener('click',()=>{S.mus=!S.mus;optsUI();if(S.mus){ac();music(true);}else music(false);save();});
+document.addEventListener('pointerdown',()=>{if(S.mus&&!musT){ac();music(true);}},{once:false});
+function gain(m){S.money+=m;S.life+=m;S.earned+=m;}
+function produce(p){S.pumps+=p;gain(p*price());if(S.order)S.order.done+=p;}
+function boost(x,sec){S.bx=x;S.bt=sec;}
+
+/* ---------- drawing ---------- */
+function face(f,sz){const hair={cap:`<path d="M-15 -8 q15 -14 30 0 v-3 q-15 -10 -30 0z" fill="${f.h}"/><path d="M-17 -9 q17 -16 34 0 l6 2 h-46z" fill="#e0342b"/>`,
+  long:`<path d="M-17 2 q-3 -24 17 -24 q20 0 17 24 l-4 0 q2 -16 -13 -17 q-15 1 -13 17z" fill="${f.h}"/>`,
+  short:`<path d="M-15 -6 q2 -15 15 -15 q13 0 15 15 q-8 -6 -15 -6 q-8 0 -15 6z" fill="${f.h}"/>`,
+  bun:`<circle cy="-21" r="7" fill="${f.h}"/><path d="M-15 -4 q0 -15 15 -15 q15 0 15 15 q-6 -8 -15 -8 q-9 0 -15 8z" fill="${f.h}"/>`}[f.t];
+  return `<svg viewBox="-24 -30 48 54" width="${sz}" height="${sz}"><circle cy="-3" r="23" fill="#ffe6b8"/><path d="M-16 24 q16 -22 32 0z" fill="${f.law?'#1b1b1b':'#2f3e6e'}"/>${f.law?'<path d="M-5 11 l5 7 l5 -7z" fill="#fff"/>':''}<circle cy="-4" r="15" fill="${f.s}"/>${hair}${f.hs?'<path d="M-16 -4 q0 -19 16 -19 q16 0 16 19" stroke="#333" stroke-width="2.5" fill="none"/><rect x="-19" y="-8" width="6" height="9" rx="2" fill="#333"/><path d="M-16 1 q2 8 10 7" stroke="#333" stroke-width="1.6" fill="none"/><circle cx="-6" cy="8" r="1.8" fill="#333"/>':''}
+  <circle cx="-5" cy="-4" r="2" fill="#222"/><circle cx="5" cy="-4" r="2" fill="#222"/>${f.g?'<g fill="none" stroke="#222" stroke-width="1.3"><circle cx="-5" cy="-4" r="4.2"/><circle cx="5" cy="-4" r="4.2"/><path d="M-1 -4h2"/></g>':''}
+  ${f.m?`<path d="M-7 3 q7 -5 14 0 q-7 2 -14 0z" fill="${f.h}"/>`:''}<path d="M-4 5 q4 4 8 0" stroke="#7a2b20" stroke-width="1.6" fill="none"/></svg>`;}
+
+const PUMP=`<rect x="-2" y="-6" width="90" height="6" rx="2" fill="#3d4a44"/>
+<rect x="2" y="-36" width="42" height="28" rx="6" fill="#2f9e5b"/><g stroke="#1f6e40" stroke-width="2">${[10,17,24,31,38].map(x=>`<line x1="${x}" y1="-33" x2="${x}" y2="-11"/>`).join('')}</g>
+<ellipse cx="4" cy="-22" rx="4" ry="13" fill="#1f6e40"/><rect x="8" y="-34" width="32" height="5" rx="2" fill="#7fd6a1" opacity=".6"/>
+<rect x="6" y="-10" width="10" height="4" fill="#1f6e40"/><rect x="30" y="-10" width="10" height="4" fill="#1f6e40"/>
+<rect x="44" y="-27" width="9" height="11" rx="2" fill="#9aa3a0"/>
+<rect x="56" y="-50" width="14" height="12" fill="#2f9e5b"/><rect x="52" y="-54" width="22" height="5" rx="1.5" fill="#1f6e40"/>
+<rect x="76" y="-31" width="10" height="13" fill="#2f9e5b"/><rect x="84" y="-35" width="5" height="21" rx="1.5" fill="#1f6e40"/>
+<circle cx="63" cy="-24" r="17" fill="#2f9e5b" stroke="#1f6e40" stroke-width="2.5"/><circle cx="63" cy="-24" r="6" fill="#1f6e40"/><circle cx="58" cy="-30" r="4" fill="#7fd6a1" opacity=".55"/>
+<rect x="54" y="-10" width="18" height="4" fill="#1f6e40"/>`;
+const NECMI=`<g class="bob"><rect x="-15" y="-30" width="11" height="28" rx="3" fill="#2b3555"/><rect x="4" y="-30" width="11" height="28" rx="3" fill="#2b3555"/>
+<ellipse cx="-10" cy="-2" rx="10" ry="4.5" fill="#1b1b1b"/><ellipse cx="10" cy="-2" rx="10" ry="4.5" fill="#1b1b1b"/>
+<ellipse cx="-30" cy="-52" rx="8" ry="18" fill="#2f3e6e" transform="rotate(12 -30 -52)"/><circle cx="-33" cy="-35" r="6.5" fill="#f1c09a"/>
+<ellipse cy="-52" rx="29" ry="30" fill="#2f3e6e"/><path d="M-11 -78 L11 -78 L0 -44Z" fill="#fff"/><path d="M-4 -76 L4 -76 L7 -54 L0 -45 L-7 -54Z" fill="#e0342b"/>
+<circle cx="0" cy="-36" r="2" fill="#1b2340"/><circle cx="0" cy="-27" r="2" fill="#1b2340"/>
+<g class="wave"><ellipse cx="32" cy="-66" rx="7.5" ry="17" fill="#2f3e6e" transform="rotate(-35 32 -66)"/><circle cx="41" cy="-82" r="6.5" fill="#f1c09a"/></g>
+<circle cx="-22" cy="-97" r="5" fill="#f1c09a"/><circle cx="22" cy="-97" r="5" fill="#f1c09a"/><circle cy="-99" r="22" fill="#f1c09a"/>
+<ellipse cx="-19" cy="-102" rx="6" ry="9" fill="#4a3426"/><ellipse cx="19" cy="-102" rx="6" ry="9" fill="#4a3426"/><ellipse cx="-6" cy="-115" rx="6" ry="3" fill="#fff" opacity=".55"/>
+<path d="M-14 -108 q5 -4 10 0 M4 -108 q5 -4 10 0" stroke="#4a3426" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<ellipse cx="-8" cy="-100" rx="3" ry="3.8" fill="#222"/><ellipse cx="8" cy="-100" rx="3" ry="3.8" fill="#222"/><circle cx="-7" cy="-101.5" r="1" fill="#fff"/><circle cx="9" cy="-101.5" r="1" fill="#fff"/>
+<ellipse cy="-94" rx="3.8" ry="3.2" fill="#e2a37f"/><circle cx="-14" cy="-89" r="3.6" fill="#ff8a7a" opacity=".5"/><circle cx="14" cy="-89" r="3.6" fill="#ff8a7a" opacity=".5"/>
+<path d="M0 -91 c-6 -5 -16 -5 -20 2 c7 1 13 2 20 0 c7 2 13 1 20 0 c-4 -7 -14 -7 -20 -2Z" fill="#4a3426"/>
+<path d="M-8 -85 q8 8 16 0" stroke="#7a2b20" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
+
+const OUT={hat:[['none','No hat',()=>true,''],['hard','Hard hat',()=>S.ach.length>=3,'Earn 3 badges'],['fez','Fez',()=>(S.bestFair||0)>=15,'15 deals at one fair'],['top','Top hat',()=>S.ach.length>=8,'Earn 8 badges']],
+ glasses:[['none','No glasses',()=>true,''],['round','Round glasses',()=>S.tdone>=5,'Finish 5 daily tasks'],['sun','Sunglasses',()=>S.ach.length>=5,'Earn 5 badges']],
+ suit:[['navy','Navy suit',()=>true,''],['green','Green suit',()=>S.ipo>=1,'Do your first IPO'],['grey','Grey suit',()=>S.ach.length>=10,'Earn 10 badges'],['white','White suit',()=>S.ipo>=3,'Do 3 IPOs']]};
+const SUIT={navy:['#2f3e6e','#2b3555'],green:['#2f7d4f','#245f3c'],grey:['#6b7280','#4b5260'],white:['#e9e4da','#bdb5a6']};
+const HAT={none:'',hard:'<path d="M-23 -110 Q-22 -134 0 -135 Q22 -134 23 -110Z" fill="#ffc23d"/><rect x="-28" y="-112" width="56" height="6" rx="3" fill="#f0a500"/><rect x="-3" y="-134" width="6" height="22" fill="#f0a500"/>',
+ fez:'<path d="M-14 -116 L-11 -142 L11 -142 L14 -116Z" fill="#c0182b"/><ellipse cy="-142" rx="11" ry="3" fill="#a01424"/><path d="M0 -142 q8 4 10 16" stroke="#111" stroke-width="2" fill="none"/><circle cx="10" cy="-125" r="2.5" fill="#111"/>',
+ top:'<rect x="-15" y="-152" width="30" height="34" rx="2" fill="#1b1b1b"/><rect x="-15" y="-127" width="30" height="6" fill="#e0342b"/><ellipse cy="-118" rx="26" ry="5" fill="#1b1b1b"/>'};
+const GLS={none:'',sun:'<rect x="-17" y="-106" width="14" height="10" rx="4" fill="#111"/><rect x="3" y="-106" width="14" height="10" rx="4" fill="#111"/><path d="M-3 -102h6" stroke="#111" stroke-width="2"/><rect x="-14" y="-104" width="5" height="2" fill="#fff" opacity=".4"/>',
+ round:'<g fill="none" stroke="#3a2a20" stroke-width="2"><circle cx="-8" cy="-100" r="7"/><circle cx="8" cy="-100" r="7"/><path d="M-1 -100h2M-15 -101l-6 -2M15 -101l6 -2"/></g>'};
+function necmi(o){o=o||S.out||{};const c=SUIT[o.suit]||SUIT.navy;return NECMI.split('#2f3e6e').join(c[0]).split('#2b3555').join(c[1]).replace(/<\/g>$/,(GLS[o.glasses]||'')+(HAT[o.hat]||'')+'</g>');}
+const GOLD=NECMI.replace(/fill="#[0-9a-fA-F]{3,6}"/g,'fill="#d4a017"').replace(/stroke="#[0-9a-fA-F]{3,6}"/g,'stroke="#9c7410"').replace('class="bob"','').replace('class="wave"','');
+const DECO=[{n:'Flower beds',c:5e4},{n:'Shade tree',c:2e6},{n:'Company flag',c:5e7},{n:'Fountain',c:1e9},{n:'Delivery truck',c:3e10},{n:'Solar roof',c:1e12},{n:'Golden Necmi statue',c:2e13}];
+const hasD=i=>(S.deco||[]).includes(i);
+function hall(x,w,h,col){const top=170-h;let win='';for(let wx=x+10;wx<x+w-14;wx+=20)win+=`<rect x="${wx}" y="${top+14}" width="12" height="12" rx="2" fill="#ffe7a3"/>`;
+  let saw='';const n=Math.max(2,Math.round(w/30)),sw=w/n;for(let i=0;i<n;i++)saw+=`L${x+i*sw} ${top} L${x+i*sw} ${top-14} L${x+(i+1)*sw} ${top} `;
+  return `<path d="M${x} ${top} ${saw} L${x+w} ${top}Z" fill="var(--roof)"/><rect x="${x}" y="${top}" width="${w}" height="${h}" fill="${col}"/>${win}<rect x="${x+w/2-10}" y="${146}" width="20" height="24" rx="2" fill="var(--roof)"/>`;}
+function chimney(x,top){return `<rect x="${x}" y="${top}" width="12" height="${170-top}" fill="#6b5a52"/><rect x="${x-2}" y="${top}" width="16" height="5" fill="#4b3d37"/>
+  <circle class="smoke" cx="${x+6}" cy="${top-6}" r="6" fill="#ddd" /><circle class="smoke" style="animation-delay:-1.5s" cx="${x+8}" cy="${top-8}" r="5" fill="#ddd"/>`;}
+let drawnStage=-1;
+function drawScene(){const st=stageIdx(),key=st+'-'+S.prod.lastIndexOf(true)+'-'+(S.deco||[]).join('.')+'-'+JSON.stringify(S.out);if(key===drawnStage)return;drawnStage=key;const SHOW=PRODUCTS[S.prod.lastIndexOf(true)].g();
+  let b='';
+  if(st>=4)b+=`<rect x="196" y="22" width="34" height="148" fill="#3d5a80"/>`+Array.from({length:7},(_,i)=>`<rect x="201" y="${30+i*19}" width="24" height="9" fill="#ffe7a3"/>`).join('')+`<circle cx="213" cy="14" r="9" fill="#2b6cb0" stroke="#fff" stroke-width="2"/>`;
+  if(st>=2)b+=hall(150,60,50,'#b5453a');
+  if(st>=3)b+=`<rect x="128" y="92" width="16" height="78" fill="#8a8f98"/><ellipse cx="136" cy="92" rx="11" ry="5" fill="#a9aeb6"/><rect x="128" y="104" width="16" height="4" fill="#e0342b"/>`;
+  const W=[95,120,125,130,135][st];
+  b+=st>=1?chimney(30,62):'';b+=st>=3?chimney(54,72):'';
+  b+=hall(16,W,[44,62,66,70,74][st],'var(--hall)');
+  const top=170-[44,62,66,70,74][st];
+  if(hasD(5))for(let x=20;x<16+W-16;x+=20)b+=`<path d="M${x} ${top-3} l6 -11 h12 l-6 11z" fill="#24407a" stroke="#9fb4e0" stroke-width=".8"/>`;
+  if(hasD(1))b+='<rect x="229" y="140" width="7" height="28" fill="#7b4a2a"/><circle cx="222" cy="136" r="10" fill="#2f8a44"/><circle cx="243" cy="136" r="10" fill="#2f8a44"/><circle cx="232" cy="126" r="15" fill="#3f9d4f"/>';
+  if(hasD(6))b+=`<rect x="248" y="154" width="22" height="14" fill="#b8b0a3"/><rect x="246" y="152" width="26" height="4" fill="#cfc8bb"/><g transform="translate(259 152) scale(.3)">${GOLD}</g>`;
+  if(hasD(2))b+='<line x1="352" y1="168" x2="352" y2="90" stroke="#9aa3a0" stroke-width="3"/><circle cx="352" cy="89" r="2.5" fill="#ffc23d"/><path d="M350 93 h-26 l4 9 l-4 9 h26z" fill="#2f9e5b"/><text x="338" y="106" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="9" fill="#fff">YP</text>';
+  b+=`<rect x="${16+W/2-40}" y="${top-34}" width="80" height="18" rx="4" fill="#fff" stroke="#e0342b" stroke-width="2"/><text x="${16+W/2}" y="${top-21}" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="11" fill="#e0342b">YEŞİL POMPA</text>`;
+  $('svg').innerHTML=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient>
+  <g id="pmp" transform="scale(.27)">${PUMP}</g>
+  <clipPath id="bc"><rect x="0" y="170" width="178" height="30"/></clipPath></defs>
+  <rect width="360" height="215" fill="url(#sk)"/><circle cx="320" cy="34" r="18" fill="#fff6c8" opacity=".9"/>
+  <path d="M0 150 q60 -30 120 -4 t130 -6 t110 0 V170 H0z" fill="var(--ground)" opacity=".45"/>
+  ${b}<rect y="168" width="360" height="47" fill="var(--ground)"/>
+  <rect x="6" y="186" width="174" height="8" rx="4" fill="#4b3d37"/>
+  ${hasD(0)?'<rect x="6" y="207" width="62" height="7" rx="3" fill="#7b4a2a"/>'+[12,22,32,42,52,62].map((x,i)=>`<line x1="${x}" y1="208" x2="${x}" y2="201" stroke="#2f7d4f" stroke-width="1.5"/><circle cx="${x}" cy="200" r="3.6" fill="${['#e0342b','#ffc23d','#ff8fb1'][i%3]}"/><circle cx="${x}" cy="200" r="1.2" fill="#fff6c8"/>`).join(''):''}
+  ${hasD(3)?'<ellipse cx="98" cy="209" rx="20" ry="5" fill="#9aa3a0"/><ellipse cx="98" cy="208" rx="16" ry="3" fill="#6cc3ea"/><rect x="96" y="198" width="4" height="10" fill="#9aa3a0"/><path class="spray" d="M98 198 q-8 -6 -14 8 M98 198 q8 -6 14 8 M98 198 v-4" stroke="#6cc3ea" stroke-width="2" fill="none"/>':''}
+  ${hasD(4)?'<rect x="128" y="197" width="34" height="14" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.5"/><text x="145" y="207" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="9" fill="#2f9e5b">YP</text><path d="M162 201 h10 l6 5 v5 h-16z" fill="#2f9e5b"/><rect x="166" y="203" width="6" height="3" fill="#cfe9ff"/><circle cx="136" cy="212" r="3.5" fill="#222"/><circle cx="154" cy="212" r="3.5" fill="#222"/><circle cx="172" cy="212" r="3.5" fill="#222"/>':''}
+  <g clip-path="url(#bc)"><g class="belt" id="belt">${Array.from({length:5},(_,i)=>`<use href="#pmp" x="${-50+i*70}" y="187"/>`).join('')}</g></g>
+  <ellipse cx="228" cy="209" rx="40" ry="4" fill="#0003"/><g transform="translate(190 209) scale(.84)"><g id="bigp" class="bigp">${SHOW}</g></g>
+  <g transform="translate(305 208) scale(.82)"><g id="nec" style="cursor:pointer">${necmi()}</g></g>`;
+  $('nec').addEventListener('click',e=>{e.stopPropagation();S.nt++;jump();if(!$('bubble').classList.contains('on'))say(QUOTES[Math.random()*QUOTES.length|0],'OK',null);});
+}
+$('mNec').innerHTML=necmi();
+$('tap').insertAdjacentHTML('afterbegin',`<svg viewBox="-4 -56 96 58" aria-hidden="true">${PUMP}</svg>`);
+function jump(){const g=$('nec');if(!g)return;g.classList.remove('jump');void g.getBBox();g.classList.add('jump');}
+
+/* ---------- Necmi speech ---------- */
+let bubbleFn=null,bubbleTimer=0;
+function say(t,b,fn){$('btxt').textContent=t;$('bbtn').textContent=b;bubbleFn=fn;bubbleTimer=fn?14:6;$('bubble').classList.add('on');jump();}
+$('bubble').addEventListener('click',e=>e.stopPropagation());
+$('bbtn').addEventListener('click',e=>{e.stopPropagation();const fn=bubbleFn;bubbleFn=null;$('bubble').classList.remove('on');
+  if(fn){sfx('buy');const r=fn();if(r)floatText(r,60,40);renderList();save();}});
+
+function floatText(t,xp,yp){const s=document.createElement('span');s.className='float';s.textContent=t;s.style.left=xp+'%';s.style.top=yp+'%';$('scene').appendChild(s);setTimeout(()=>s.remove(),800);}
+
+/* ---------- tapping ---------- */
+function tapAt(xp,yp){S.taps++;sfx('tap',8);const bp=$('bigp');if(bp){bp.classList.remove('pulse');void bp.getBBox();bp.classList.add('pulse');}const p=tapPow();produce(p);floatText('+'+fmtM(p*price()),xp,yp);updateUI();}
+$('scene').addEventListener('click',e=>{const r=$('scene').getBoundingClientRect();tapAt((e.clientX-r.left)/r.width*100-6,(e.clientY-r.top)/r.height*100-10);});
+$('tap').addEventListener('click',()=>tapAt(30+Math.random()*30,45));
+
+/* ---------- lists ---------- */
+let tab='d',mult=1;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('multBox').style.display=tab==='d'?'':'none';const tn={i:'IPOs done: '+S.ipo+'. Later runs grow much faster.',p:'Each new product raises your sale price and goes on display.',a:'Each badge adds a permanent +5% to all production. Earned: '+S.ach.length+' / '+ACH.length}[tab];$('tabNote').style.display=tn?'':'none';$('tabNote').textContent=tn||'';renderList();}));
+document.querySelectorAll('.mult button').forEach(b=>b.addEventListener('click',()=>{mult=+b.dataset.m;document.querySelectorAll('.mult button').forEach(x=>x.classList.toggle('on',x===b));renderList();}));
+
+function renderList(){
+  if(tab==='d'){$('list').innerHTML=DEPTS.map((d,i)=>{const l=S.lv[i],nm=nextMile(l),prev=[0,25,50,100,200,300].filter(x=>x<=l).pop();
+    const lock=i>0&&S.lv[i-1]===0&&l===0;
+    return `<div class="item${lock?' locked':''}"><div class="badge" style="background:${d.col}">${l}</div>
+    <div><h3>${d.n}</h3><p>${l?fmt(deptRate(i)*effMul('prod')*achMul())+' pumps/s':d.d}${nm&&l?` · ×2 at level ${nm}`:''}</p>${nm?`<div class="mini"><i style="width:${(l-prev)/(nm-prev)*100}%"></i></div>`:''}</div>
+    <button data-buy="${i}" ${lock?'data-lock="1"':''}>${lock?'Locked':fmtM(cost(i,mult))}</button></div>`;}).join('');}
+  else if(tab==='p'){$('list').innerHTML=PRODUCTS.map((p,i)=>{const lock=i>0&&!S.prod[i-1];return `<div class="item${lock?' locked':''}"><div class="pico"><svg viewBox="-6 -94 104 96">${p.g()}</svg></div><div><h3>${p.n}</h3><p>${p.d}</p></div>
+    ${S.prod[i]?'<div class="hired">In production</div>':`<button data-prod="${i}" ${lock?'data-lock="1"':''}>${lock?'Locked':fmtM(p.c)}</button>`}</div>`}).join('');}
+  else if(tab==='i'){const g=invGain(),ok=g>=2;$('list').innerHTML=`<div class="ipo"><div class="k"><div><small>Investors</small><b>${S.inv}</b><small>+${S.inv*10}% production</small></div><div><small>New investors if you IPO now</small><b>+${g}</b><small>needs ₺4B earned this run</small></div></div>
+    <p>Go public: you sell the company to investors and start again from the workshop. You lose money, departments, staff and products, but keep badges, daily streak and all investors. Each investor adds +10% to all production forever.</p>
+    <p>Mr. Necmi: "An IPO! I don't know what it stands for, but I'm ringing the bell."</p>
+    <button data-ipo="1" ${ok?'':'disabled'}>${ok?'Go public (+'+g+' investors)':'Earn ₺'+fmt(Math.max(0,4e9-S.life))+' more'}</button></div>`;}
+  else if(tab==='s'){const slot=(k,label)=>`<div class="slot"><h4>${label}</h4><div class="chips">${OUT[k].map(o=>{const ok=o[2]();return `<button class="chip${S.out[k]===o[0]?' on':''}" data-out="${k}:${o[0]}" ${ok?'':'disabled'}>${o[1]}${ok?'':'<small>'+o[3]+'</small>'}</button>`}).join('')}</div></div>`;
+    $('list').innerHTML=`<div class="ipo ward"><h3>Mr. Necmi's wardrobe</h3><div class="wgrid"><svg viewBox="-50 -158 100 163" class="prev">${necmi()}</svg><div>${slot('hat','Hat')}${slot('glasses','Glasses')}${slot('suit','Suit')}</div></div></div>
+    <h3 class="sec">Factory yard <small>each item +3% production</small></h3>`+DECO.map((d,i)=>`<div class="item"><div class="badge" style="background:${hasD(i)?'#2f9e5b':'var(--line)'};color:${hasD(i)?'#fff':'var(--mute)'}">${hasD(i)?'✓':i+1}</div><div><h3>${d.n}</h3><p>${hasD(i)?'In the yard':'Decorates the factory scene'}</p></div>${hasD(i)?'<div class="hired">Placed</div>':`<button data-deco="${i}">${fmtM(d.c)}</button>`}</div>`).join('');}
+  else if(tab==='a'){$('list').innerHTML=(S.story.length?`<div class="ipo"><h3 style="margin:0;font-size:17px">Story so far</h3><p>Replay any chapter you've unlocked.</p><div class="stories">${S.story.slice().sort((a,b)=>a-b).map(i=>`<button class="chip" data-story="${i}">${i+1}. ${STORY[i].t}</button>`).join('')}</div></div>`:'')+ACH.map((a,i)=>{const g=S.ach.includes(i);return `<div class="item ach${g?' got':''}"><div class="badge">${g?'★':'?'}</div><div><h3>${a[0]}</h3><p>${a[1]}</p></div><div class="hired" style="color:${g?'#2f9e5b':'var(--mute)'}">${g?'+5%':'Locked'}</div></div>`}).join('');}
+  else{$('list').innerHTML=EMPS.map((e,i)=>[e,i]).sort((a,b)=>a[0].c-b[0].c).map(([e,i])=>`<div class="item"><div>${face(e.f,48)}</div><div><h3>${e.n}</h3><p>${e.d}</p></div>
+    ${S.emp[i]?'<div class="hired">Hired</div>':`<button data-hire="${i}">${fmtM(e.c)}</button>`}</div>`).join('');}
+  updateButtons();}
+function updateButtons(){document.querySelectorAll('[data-buy]').forEach(b=>{b.disabled=!!b.dataset.lock||S.money<cost(+b.dataset.buy,mult);});
+  document.querySelectorAll('[data-hire]').forEach(b=>{b.disabled=S.money<EMPS[+b.dataset.hire].c;});
+  document.querySelectorAll('[data-deco]').forEach(b=>{b.disabled=S.money<DECO[+b.dataset.deco].c;});
+  document.querySelectorAll('[data-prod]').forEach(b=>{b.disabled=!!b.dataset.lock||S.money<PRODUCTS[+b.dataset.prod].c;});}
+$('list').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.dataset.buy!==undefined){const i=+b.dataset.buy,c=cost(i,mult);if(S.money>=c){S.money-=c;const was=S.lv[i];S.lv[i]+=mult;S.lb+=mult;
+    if(was===0&&i===0)say('Our first department is open! Now we build pumps even while I nap.','Great',null);
+    else if(nextMile(was)!==nextMile(S.lv[i]))say(DEPTS[i].n+' sped up! Production doubled. All part of my plan, of course.','Of course',null);}}
+  if(b.dataset.hire!==undefined){const i=+b.dataset.hire;if(S.money>=EMPS[i].c){S.money-=EMPS[i].c;S.emp[i]=true;say(EMPS[i].n.split(' ').pop()+' joined the team! Welcome party? No? Okay.','Welcome',null);}}
+  if(b.dataset.story!==undefined){playStory(+b.dataset.story);return;}
+  if(b.dataset.out){const [k,v]=b.dataset.out.split(':');S.out[k]=v;drawScene();$('mNec').innerHTML=necmi();sfx('pop');jump();renderList();save();return;}
+  if(b.dataset.deco!==undefined){const i=+b.dataset.deco,d=DECO[i];if(S.money>=d.c&&!hasD(i)){S.money-=d.c;S.deco.push(i);drawScene();say(d.n+' added to the yard! Very classy. Like me.','Lovely',null);}}
+  if(b.dataset.ipo){if(b.dataset.arm){doIPO();return;}b.dataset.arm='1';b.textContent='Sure? Tap again to go public';return;}
+  if(b.dataset.prod!==undefined){const i=+b.dataset.prod,p=PRODUCTS[i];if(S.money>=p.c){S.money-=p.c;S.prod[i]=true;drawScene();say(p.n+' is now in production! Everyone at the trade fair will talk about it. My idea, obviously.','Awesome',null);}}
+  sfx('buy',15);renderList();updateUI();save();});
+
+/* ---------- orders ---------- */
+function newOrder(){const n=Math.max(25,Math.round(baseRate()*50+tapPow()*25));
+  S.order={name:ORDERS[Math.random()*ORDERS.length|0],need:n,done:0,t:60,rew:n*price()*3*effMul('order')};}
+function orderUI(){const o=S.order,el=$('order');if(!o){el.classList.remove('on');return;}el.classList.add('on');
+  $('oName').textContent=o.name+': '+fmt(o.need)+' fire pumps';$('oProg').textContent=fmt(Math.min(o.done,o.need))+' / '+fmt(o.need)+' pumps';
+  $('oTime').textContent=Math.ceil(o.t)+' s';$('oBar').style.width=Math.min(100,o.done/o.need*100)+'%';$('oRew').textContent=fmtM(o.rew);}
+
+/* ---------- modal ---------- */
+const mq=[];function showM(){const m=mq[0];if(!m)return;$('mT').textContent=m[0];$('mP').textContent=m[1];$('mB').textContent=m[2]||'Great';$('modal').classList.add('on');}
+function modal(t,p,b){mq.push([t,p,b]);if(mq.length===1)showM();}
+$('mB').addEventListener('click',()=>{mq.shift();$('modal').classList.remove('on');if(mq.length)setTimeout(showM,150);});
+function doIPO(){const g=invGain();if(g<2)return;const keep={story:S.story,out:S.out,deco:S.deco,oseen:S.oseen,un:S.un,mor:S.mor,mc:S.mc,q:S.q,earned:S.earned,lb:S.lb,fairs:S.fairs,mu:S.mu,tdone:S.tdone,inv:S.inv+g,ipo:S.ipo+1,ach:S.ach,dy:S.dy,taps:S.taps,nt:S.nt,done:S.done,snd:S.snd,mus:S.mus,bestFair:S.bestFair||0};
+  S=Object.assign(fresh(),keep);drawnStage=-1;lastStage=0;drawScene();sfx('win',[40,60,40]);
+  modal('Yeşil Pompa is public!','You now have '+S.inv+' investors: +'+S.inv*10+'% production on every run. Mr. Necmi: "Back to the workshop! I missed the smell of cast iron."','Let\'s go');renderList();updateUI();save();}
+const MOR=[{n:'Tea break',v:10,cd:60,c:()=>0},{n:'Team lunch',v:30,cd:180,c:()=>Math.max(500,income()*30)},{n:'Company picnic',v:100,cd:600,c:()=>Math.max(5000,income()*180)}];
+const MSAY=['Tea for everyone! I made it myself. Well, the machine did.','Lunch is on the company! I ordered extra köfte for me.','Picnic time! I brought my famous potato salad. Nobody asked, but here it is.'];
+function morUI(){const m=Math.floor(S.mor);$('morLab').textContent=m+'% · '+(S.mor>=80?'×1.25':'×1');const b=$('morBar');b.style.width=m+'%';b.style.background=S.mor>=80?'#2f9e5b':S.mor>=50?'var(--yel)':S.mor>=25?'#f08a24':'#e0342b';
+  const now=Date.now();document.querySelectorAll('[data-mor]').forEach(x=>{const i=+x.dataset.mor,a=MOR[i],left=Math.ceil((S.mc[i]-now)/1000),c=a.c();
+    x.innerHTML=a.n+'<small>'+(left>0?'Ready in '+left+' s':(c?fmtM(c):'Free')+' · +'+(i===2?'full':a.v+'%'))+'</small>';x.disabled=left>0||S.money<c||S.mor>=100;});}
+document.querySelector('.mbtns').addEventListener('click',e=>{const x=e.target.closest('[data-mor]');if(!x||x.disabled)return;const i=+x.dataset.mor,a=MOR[i],c=a.c();if(S.money<c)return;
+  S.money-=c;S.mor=Math.min(100,S.mor+a.v);S.mc[i]=Date.now()+a.cd*1000;S.mu++;sfx('buy',15);say(MSAY[i],'Thanks!',null);morUI();updateTasks();save();});
+const QT=[{k:'taps',t:n=>'Tap '+n+' times',n:()=>[100,200,300][Math.random()*3|0]},{k:'done',t:n=>'Complete '+n+' order'+(n>1?'s':''),n:()=>1+(Math.random()*3|0)},
+  {k:'lb',t:n=>'Buy '+n+' department levels',n:()=>[10,20,30][Math.random()*3|0]},{k:'earned',t:n=>'Earn '+fmtM(n),n:()=>{const v=Math.max(5000,income()*600),p=10**Math.floor(Math.log10(v));return Math.ceil(v/p)*p}},
+  {k:'fairs',t:()=>'Join a trade fair',n:()=>1},{k:'mu',t:n=>'Boost team morale '+n+' times',n:()=>2+(Math.random()*2|0)}];
+function questsCheck(){const t=dstr(new Date());if(S.q.d===t&&S.q.l.length)return;const pool=[...QT.keys()].sort(()=>Math.random()-.5).slice(0,3);
+  S.q={d:t,all:false,l:pool.map(i=>{const q=QT[i],n=q.n();return{i,n,b:S[q.k]||0,got:false}})};renderTasks();}
+const qProg=q=>Math.min(q.n,(S[QT[q.i].k]||0)-q.b);
+function renderTasks(){if(!S.q.l.length){$('tasks').innerHTML='';return;}$('tasks').innerHTML=`<p class="sub">Finish all 3 for a bonus investor (+10% production forever).</p>`+
+  S.q.l.map((q,j)=>`<div class="task" id="q${j}"><div class="tt">${QT[q.i].t(q.n)}</div><div class="tp"></div><div class="prog"><i></i></div><button data-q="${j}">Claim</button></div>`).join('');updateTasks();}
+function updateTasks(){const got=S.q.l.filter(q=>q.got).length,ready=S.q.l.filter(q=>!q.got&&qProg(q)>=q.n).length,ts=$('tSum');ts.textContent=ready?ready+' ready!':got+' / 3';ts.classList.toggle('hot',!!ready);S.q.l.forEach((q,j)=>{const el=$('q'+j);if(!el)return;const p=Math.max(0,qProg(q)),k=QT[q.i].k;el.classList.toggle('got',q.got);
+  el.querySelector('.tp').textContent=q.got?'Done':(k==='earned'?fmtM(p)+' / '+fmtM(q.n):fmt(p)+' / '+fmt(q.n));el.querySelector('i').style.width=(q.got?100:p/q.n*100)+'%';
+  const b=el.querySelector('button');b.disabled=q.got||p<q.n;b.textContent=q.got?'Claimed':'Claim';});}
+$('tasks').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b||b.disabled)return;const q=S.q.l[+b.dataset.q];if(q.got||qProg(q)<q.n)return;
+  q.got=true;S.tdone++;const g=Math.max(1000,income()*120);gain(g);sfx('win',[30,50,30]);toast('Task complete! +'+fmtM(g));
+  if(!S.q.all&&S.q.l.every(x=>x.got)){S.q.all=true;S.inv++;modal('All tasks done!','You earned a bonus investor: +10% production forever. Mr. Necmi: "I always said you were my best employee. Today, at least."','Great');}
+  updateTasks();updateUI();save();});
+const UNL=[['staff',()=>S.life>=1500,'New: Staff! Hire people to boost the factory.'],['tasks',()=>S.life>=3000,'New: Daily tasks! Finish all 3 for a bonus investor.'],
+  ['mor',()=>S.life>=8000,'New: Team morale! Happy staff build 25% faster.'],['prod',()=>S.life>=15000,'New: Products! Fancier pumps sell for more.'],
+  ['fair',()=>S.life>=40000,'New: Trade fairs! One opens every few minutes.'],['style',()=>S.life>=20000,'New: Style! Dress up Mr. Necmi and decorate the yard.'],['ipo',()=>S.life>=1e9,'New: IPO! Sell to investors for permanent bonuses.']];
+const has=k=>(S.un||[]).includes(k);
+function applyUnl(){const vis={e:'staff',p:'prod',i:'ipo',s:'style'};document.querySelectorAll('.tabs button').forEach(b=>{const k=vis[b.dataset.tab];b.style.display=!k||has(k)?'':'none';});
+  $('tasksBox').style.display=has('tasks')?'':'none';$('morBox').style.display=has('mor')?'':'none';}
+function unlocks(loud){if(!S.un)S.un=[];let ch=false;UNL.forEach(u=>{if(!has(u[0])&&u[1]()){S.un.push(u[0]);if(u[0]==='fair'&&S.nextFair<60)S.nextFair=60;if(u[0]==='mor')S.mor=100;ch=true;if(loud){say(u[2]+' Mr. Necmi: "My idea, of course."','Nice',null);sfx('badge');}}});if(ch){applyUnl();save();}}
+let toastT=0;function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),3000);}
+let fairT=0,gameOn=false;
+function fairUI(){const f=$('fair');if(fairT>0&&!gameOn){f.classList.add('on');$('fTime').textContent=Math.ceil(fairT)+' s';}else f.classList.remove('on');}
+$('fJoin').addEventListener('click',startGame);
+function startGame(){fairT=0;gameOn=true;S.fairs++;let left=15,deals=0;const grid=$('grid');grid.innerHTML=Array.from({length:9},(_,i)=>`<button class="booth" data-b="${i}" aria-label="Booth"></button>`).join('');
+  $('game').classList.add('on');$('gInfo').textContent='Deals: 0';$('gTime').textContent=15;fairUI();
+  const live=new Map();
+  const spawn=()=>{const free=[...Array(9).keys()].filter(i=>!live.has(i));if(!free.length)return;const i=free[Math.random()*free.length|0],spy=Math.random()<.22;
+    const e=EMPS[Math.random()*EMPS.length|0].f,f=spy?{s:'#d9a37a',h:'#111',t:'short',m:1}:{s:e.s,h:e.h,t:e.t};
+    const el=grid.children[i];el.className='booth'+(spy?' spy':'');el.innerHTML=face(f,60).replace('</svg>',spy?'<rect x="-11" y="-7" width="9" height="5" rx="2" fill="#111"/><rect x="2" y="-7" width="9" height="5" rx="2" fill="#111"/><path d="M-2 -5h4" stroke="#111" stroke-width="1.5"/></svg>':'</svg>');
+    live.set(i,{spy,t:setTimeout(()=>{live.delete(i);el.innerHTML='';el.className='booth';},spy?1100:850+Math.random()*300)});sfx('pop');};
+  grid.onclick=ev=>{const b=ev.target.closest('.booth');if(!b)return;const i=+b.dataset.b,c=live.get(i);if(!c)return;clearTimeout(c.t);live.delete(i);
+    if(c.spy){deals=Math.max(0,deals-2);b.className='booth bad';sfx('bad',40);}else{deals++;b.className='booth hit';sfx('tap',10);}
+    b.innerHTML='';setTimeout(()=>{if(!live.has(i))b.className='booth';},200);$('gInfo').textContent='Deals: '+deals;};
+  const sp=setInterval(spawn,480);spawn();
+  const tm=setInterval(()=>{left--;$('gTime').textContent=left;if(left<=0){clearInterval(sp);clearInterval(tm);live.forEach(c=>clearTimeout(c.t));
+    $('game').classList.remove('on');gameOn=false;S.bestFair=Math.max(S.bestFair||0,deals);const g=deals*Math.max(150,income()*10)*(1+.1*S.inv);gain(g);
+    sfx(deals?'win':'fail',deals?[30,50,30]:0);S.nextFair=180+Math.random()*90;
+    modal(deals+' deals at the fair!','You earned '+fmtM(g)+'. Mr. Necmi: "'+(deals>=20?'Legendary! I handed out all my business cards. Twice.':deals>=10?'Great job! I mostly stood near the free coffee.':'Not bad. Next year we bring a bigger banner.')+'"','Collect');save();}},1000);}
+const N='necmi';
+const STORY=[
+ {t:'A Workshop and a Dream',c:()=>S.lv[0]>0,l:[[N,"This dusty workshop was my grandfather's. He built one pump a week."],[N,"We will build a hundred! ...A day. Maybe. Let's start with one."],[N,"Rule one at Yeşil Pompa: pumps are green. Except fire pumps, those are red. Rule two: there are only two rules."]]},
+ {t:'The First Big Customer',c:()=>stageIdx()>=1,l:[[N,"A hotel chain called! They want pumps for twelve hotels!"],[N,"I said yes before asking the price. That's called leadership."],[0,"Boss, we have two machines and one of them is the coffee maker."],[N,"Then we buy more machines. The coffee maker stays."]]},
+ {t:'Red Means Serious',c:()=>S.prod[2],l:[[N,"Our first fire pump set! Red, because firefighters like red."],[1,"It passed the pressure test on the first try."],[N,"I knew it would. I was standing right next to it, being supportive."]]},
+ {t:'Enter IT Metin',c:()=>S.emp[6],l:[[6,"Who set the admin password to 'necmi123'?"],[N,"Nobody. Also it's 'necmi1234' now. Much safer."],[6,"...I'm resetting everything."]]},
+ {t:'The Rival Appears',c:()=>stageIdx()>=2,l:[[N,"A rival company copied our booth at the fair! Same tie, same mustache!"],[N,"Fine, mustaches are common. But the TIE!"],[N,"We beat them the honest way: better pumps and more coffee."]]},
+ {t:'Counsel Has Arrived',c:()=>S.emp[7],l:[[7,"Mr. Necmi, I reviewed our contracts. One of them is written on a napkin."],[N,"That was a very official napkin."],[7,"From now on every deal goes through me. Every. Single. One."],[N,"...Can I still sign the birthday cards?"],[7,"Those too."]]},
+ {t:'Pumps Across the Country',c:()=>stageIdx()>=3,l:[[N,"Every city has a Yeşil Pompa now. Even the one with no water. They use it for decoration."],[7,"Our order book is full for six months."],[6,"And the servers survived. Barely."],[N,"Team, I'm proud of you. Lunch is on the company! Begüm, is that legal?"],[7,"Yes, Mr. Necmi."]]},
+ {t:'Ringing the Bell',c:()=>S.ipo>=1,l:[[N,"I rang the stock exchange bell! Then I rang it again. They asked me to stop."],[N,"The investors want us to start fresh and grow even bigger."],[N,"Back to the workshop! I missed the smell of cast iron."]]},
+ {t:"The World's Best Boss?",c:()=>stageIdx()>=4,l:[[N,"Pumps on five continents. And maybe, just maybe, a statue of me."],[7,"No statues without a permit, Mr. Necmi."],[6,"I already 3D-printed one. Small, though."],[N,"The real treasure was the team we built along the way. And the money. Mostly the team!"],[N,"The end? No! Keep growing. I'll be in my office. Napping. Strategically."]]}];
+let stOn=null;
+function avatar(w){return w===N?`<svg viewBox="-50 -158 100 163">${necmi()}</svg>`:face(EMPS[w].f,64);}
+function showLine(){const c=STORY[stOn.i],ln=c.l[stOn.j];$('sCh').textContent='Chapter '+(stOn.i+1);$('sT').textContent=c.t;
+  $('sAv').innerHTML=avatar(ln[0]);$('sWho').textContent=ln[0]===N?'Mr. Necmi':EMPS[ln[0]].n;const p=$('sTx');p.textContent=ln[1];p.style.animation='none';void p.offsetWidth;p.style.animation='';
+  $('sPg').textContent=(stOn.j+1)+' / '+c.l.length;$('sNext').textContent=stOn.j<c.l.length-1?'Next':'Close';}
+function playStory(i){stOn={i,j:0};showLine();$('story').classList.add('on');sfx('pop');}
+$('sNext').addEventListener('click',()=>{if(!stOn)return;stOn.j++;if(stOn.j>=STORY[stOn.i].l.length){$('story').classList.remove('on');if(!S.story.includes(stOn.i)){S.story.push(stOn.i);save();}stOn=null;if(tab==='a')renderList();}else{sfx('tap');showLine();}});
+function checkStory(){if(stOn||gameOn||$('modal').classList.contains('on')||$('bubble').classList.contains('on'))return;const i=STORY.findIndex((c,k)=>!S.story.includes(k)&&c.c());if(i>=0)playStory(i);}
+let achAcc=0;function checkAch(){if(has('style'))Object.values(OUT).flat().forEach(o=>{if(o[3]&&o[2]()&&!S.oseen.includes(o[0])){S.oseen.push(o[0]);toast('New outfit for Mr. Necmi: '+o[1]+' (Style tab)');if(tab==='s')renderList();}});ACH.forEach((a,i)=>{if(!S.ach.includes(i)&&a[2]()){S.ach.push(i);toast('Badge earned: '+a[0]+' · production +5%');sfx('badge',[20,40,20]);if(tab==='a')renderList();}});}
+const dstr=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+function daily(){questsCheck();const t=dstr(new Date());if(S.dy.d===t)return;const y=dstr(new Date(Date.now()-864e5));
+  const st=S.dy.d===y?Math.min(7,S.dy.s+1):1;S.dy={d:t,s:st};const g=Math.max(500*st,income()*90*st);gain(g);
+  modal('Daily reward: day '+st,'Mr. Necmi: "I love employees who show up every day!" You earned '+fmtM(g)+'. Come back tomorrow: the reward grows for up to 7 days.','Collect');save();}
+
+/* ---------- main loop ---------- */
+let lastT=performance.now(),saveAcc=0,lastStage=stageIdx();
+function updateUI(){$('money').textContent=fmtM(S.money);$('rate').textContent=fmt(rate())+' pumps/s · '+fmtM(income())+'/s';
+  const st=stageIdx();$('stage').textContent=STAGES[st][1];
+  if(st<STAGES.length-1){const a=STAGES[st][0],z=STAGES[st+1][0],p=Math.min(1,(S.life-a)/(z-a));$('prog').style.width=p*100+'%';$('plab').textContent='Next: '+STAGES[st+1][1];$('ppct').textContent=Math.floor(p*100)+'%';}
+  else{$('prog').style.width='100%';$('plab').textContent='You made it to the top!';$('ppct').textContent='';}
+  const bt=$('boostTag');if(boosting()){bt.style.display='block';bt.textContent='Production ×'+S.bx+' · '+Math.ceil(S.bt)+' s';}else bt.style.display='none';
+  const belt=$('belt');if(belt){const r=rate();belt.style.animationPlayState=r>0?'running':'paused';belt.style.animationDuration=Math.max(.5,3/(1+Math.log10(1+r)))+'s';}
+  orderUI();updateButtons();}
+
+function tick(){const now=performance.now(),dt=Math.min(1,(now-lastT)/1000);lastT=now;
+  produce(rate()*dt);
+  if(S.bt>0){S.bt=Math.max(0,S.bt-dt);if(!S.bt)S.bx=1;}
+  if(S.order){S.order.t-=dt;
+    if(S.order.done>=S.order.need){gain(S.order.rew);S.done++;sfx('win',[30,50,30]);say(S.order.name+' order delivered on time! Reward: '+fmtM(S.order.rew)+'. I arranged that.','Bravo',null);S.order=null;S.nextOrder=50+Math.random()*40;renderList();}
+    else if(S.order.t<=0){sfx('fail');say('We missed the '+S.order.name.toLowerCase()+' order... Next time! I\'m still proud of us.','Okay',null);S.order=null;S.nextOrder=40+Math.random()*30;}}
+  else if(S.lv[0]>0||S.life>500){S.nextOrder-=dt;if(S.nextOrder<=0)newOrder();}
+  if(!$('bubble').classList.contains('on')){S.nextEvent-=dt;if(S.nextEvent<=0&&S.life>300){const se=STAFF_EV.filter(x=>S.emp[x[0]]);if(se.length&&Math.random()<.4){const x=se[Math.random()*se.length|0];say(x[1],x[2],x[3]);}else{const ev=EVENTS[Math.random()*EVENTS.length|0];say(ev.t,ev.b,ev.f);}S.nextEvent=50+Math.random()*50;}}
+  else{bubbleTimer-=dt;if(bubbleTimer<=0){bubbleFn=null;$('bubble').classList.remove('on');}}
+  const st=stageIdx();if(st>lastStage){lastStage=st;drawScene();modal('You are now a '+STAGES[st][1]+'!','Mr. Necmi: "I told you so! I built this company. You helped a little too."','Hooray');}
+  if(!gameOn){if(fairT>0){fairT-=dt;if(fairT<=0){fairT=0;S.nextFair=150+Math.random()*90;}}else if(has('fair')){S.nextFair-=dt;if(S.nextFair<=0){fairT=25;sfx('badge');toast('The trade fair is open! Join below the factory.');}}}
+  if(!gameOn&&has('mor')&&S.mor>50)S.mor=Math.max(50,S.mor-dt/45);
+  fairUI();achAcc+=dt;if(achAcc>.9){checkStory();morUI();updateTasks();unlocks(true);}if(achAcc>1){achAcc=0;checkAch();}
+  updateUI();saveAcc+=dt;if(saveAcc>5){saveAcc=0;save();}}
+
+function save(){S.last=Date.now();store.set('pompaFab',JSON.stringify(S));}
+function catchUp(){const sec=Math.min((S.emp[6]?24:8)*3600,(Date.now()-S.last)/1000);if(sec<10){S.last=Date.now();return;}
+  const earn=baseRate()*price()*sec*offRate();if(S.mor>50)S.mor=Math.max(50,S.mor-sec/90);S.last=Date.now();lastT=performance.now();
+  if(earn>=1){gain(earn);S.pumps+=baseRate()*sec*offRate();
+    const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);
+    modal('You earned '+fmtM(earn)+' while away!','Mr. Necmi: "I ran the factory for '+(h?h+' h ':'')+m+' min. Well... mostly by napping."'+(S.emp[3]?'':' (Hire Accountant Gülten to double offline earnings.)'),'Collect');}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();else{catchUp();daily();updateUI();}});
+window.addEventListener('pagehide',save);
+
+let resetArm=false;
+$('reset').addEventListener('click',()=>{if(!resetArm){resetArm=true;$('reset').textContent='Are you sure? All progress will be lost. Tap again.';setTimeout(()=>{resetArm=false;$('reset').textContent='Reset game';},4000);return;}
+  store.del('pompaFab');S=fresh();S.dy={d:dstr(new Date()),s:1};optsUI();questsCheck();applyUnl();renderTasks();morUI();drawnStage=-1;lastStage=0;resetArm=false;$('reset').textContent='Reset game';drawScene();renderList();updateUI();});
+
+drawScene();
+const isNew=S.life===0;
+catchUp();
+if(isNew)modal('Welcome to Yeşil Pompa Inc.!','Mr. Necmi: "I\'m the general manager, and you are... the person who runs the factory. Tap the factory, build pumps, open departments. I\'ll handle morale!"','Let\'s go');
+daily();unlocks(false);applyUnl();renderTasks();optsUI();morUI();renderList();updateUI();
+setInterval(tick,100);
+}
+</script>
+</body>
+</html>
