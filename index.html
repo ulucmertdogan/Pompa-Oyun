@@ -154,11 +154,26 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .sname{font:800 clamp(48px,14vw,76px)/1 "Baloo 2",sans-serif;color:#00a386;letter-spacing:.04em;animation:sIn .6s .15s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes sIn{from{opacity:0;transform:translateY(14px) scale(.85)}}
 @media(prefers-reduced-motion:reduce){.sico,.sname{animation:none}.splash{transition:none}}
-.ship{transform:translateX(-90px);visibility:hidden}.ship.go{visibility:visible;animation:ship 2.8s ease-in forwards}@keyframes ship{to{transform:translateX(440px)}}
+.ship{transform:translateX(-90px);visibility:hidden}.ship.go{visibility:visible;animation:ship 4s ease-in forwards}@keyframes ship{to{transform:translateX(1150px)}}
 .off.first{border-color:var(--yel);animation:glow 1.6s ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 0 5px light-dark(#ffc23d66,#ffc23d44)}}
 .tag.fj{align-self:flex-start;margin:0 0 2px;font-size:12px}.off.rc{border-color:#2f9e5b;background:light-dark(#effaf3,#12291c)}
 .pv{color:#2f9e5b;font-weight:800}.rl{display:flex;flex-direction:column;gap:4px;text-align:left;font-size:15px;color:var(--ink)}.rl div:last-child{color:var(--mute);margin-top:4px}
 @media(prefers-reduced-motion:reduce){.ship.go{animation:none;visibility:hidden}.off.first{animation:none}}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin 1.6s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.swing{transform-box:fill-box;transform-origin:50% 100%;animation:swing 1.8s ease-in-out infinite alternate}@keyframes swing{from{transform:rotate(-28deg)}to{transform:rotate(28deg)}}
+.needle{transform-box:fill-box;transform-origin:50% 100%;animation:needle 2.2s ease-in-out infinite alternate}@keyframes needle{from{transform:rotate(-70deg)}to{transform:rotate(55deg)}}
+.blink{animation:blink 1.2s steps(2) infinite}@keyframes blink{50%{opacity:.15}}
+.spark{transform-box:fill-box;animation:spark 1.2s ease-out infinite}@keyframes spark{to{transform:translateY(-16px);opacity:0}}
+.glow{animation:glow2 1.4s ease-in-out infinite alternate}@keyframes glow2{from{opacity:.55}to{opacity:1}}
+.flow{stroke-dasharray:3 3;animation:flow .6s linear infinite}@keyframes flow{to{stroke-dashoffset:-6}}
+.walk{animation:walk var(--d) ease-in-out infinite alternate}@keyframes walk{to{transform:translateX(var(--x))}}
+.drive{animation:drive var(--d) linear infinite}@keyframes drive{to{transform:translateX(var(--x))}}
+.cloud{animation:cloud 40s linear infinite}@keyframes cloud{from{transform:translateX(-40px)}to{transform:translateX(60px)}}
+.tint{opacity:0;pointer-events:none;transition:opacity 1s}.lit{opacity:0;pointer-events:none;transition:opacity 1s}
+.scene[data-tod=night] .tint{opacity:.42}.scene[data-tod=night] .lit{opacity:1}.scene[data-tod=eve] .tint{opacity:.14}.scene[data-tod=eve] .lit{opacity:.6}.scene[data-tod=dawn] .tint{opacity:.1}
+.scene #bg{z-index:0}.scene #svg{z-index:1}
+.item.flash{animation:flash 1.6s ease-out}@keyframes flash{0%,40%{box-shadow:0 0 0 4px var(--yel)}}
+@media(prefers-reduced-motion:reduce){.spin,.swing,.needle,.blink,.spark,.glow,.flow,.walk,.drive,.cloud,.item.flash{animation:none}}
 .hired{font-weight:800;color:#2f9e5b;font-size:14px;text-align:right}
 .modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
 .modal.on{display:flex}
@@ -183,7 +198,7 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 
 
   <div class="scene" id="scene" aria-label="Tap the factory to build pumps">
-    <svg viewBox="0 0 360 215" id="svg"></svg>
+    <svg viewBox="0 0 360 215" id="bg" aria-hidden="true"></svg><svg viewBox="0 0 360 215" id="svg"></svg>
     <div class="boostTag" id="boostTag"></div>
     <div class="bubble" id="bubble"><div id="btxt"></div><button id="bbtn">OK</button></div>
   </div>
@@ -535,42 +550,98 @@ function erol(o){o=o||S.out||{};const c=SUIT[o.suit]||SUIT.navy;return EROL.spli
 const GOLD=EROL.replace(/fill="#[0-9a-fA-F]{3,6}"/g,'fill="#d4a017"').replace(/stroke="#[0-9a-fA-F]{3,6}"/g,'stroke="#9c7410"').replace('class="bob"','').replace('class="wave"','');
 const DECO=[{n:'Flower beds',c:5e4},{n:'Shade tree',c:2e6},{n:'Company flag',c:5e7},{n:'Fountain',c:1e9},{n:'Delivery truck',c:3e10},{n:'Solar roof',c:1e12},{n:'Golden Erol statue',c:2e13}];
 const hasD=i=>(S.deco||[]).includes(i);
-function hall(x,w,h,col){const top=170-h;let win='';for(let wx=x+10;wx<x+w-14;wx+=20)win+=`<rect x="${wx}" y="${top+14}" width="12" height="12" rx="2" fill="#ffe7a3"/>`;
+const SC={ground:'#e8b15a',ground2:'#d99a45',roof:'#7b2e22',hall:'#c9503a',win:'#ffe7a3'};
+const DX=[[10,140],[372,470],[482,612],[624,714],[726,832],[844,922]];
+let WINS=[];
+function winR(x,y,w,h){WINS.push([x,y,w,h]);return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="${SC.win}"/>`;}
+function hall(x,w,h,col,roof){const top=170-h;let win='';for(let wx=x+10;wx<x+w-14;wx+=20)win+=winR(wx,top+14,12,12);
   let saw='';const n=Math.max(2,Math.round(w/30)),sw=w/n;for(let i=0;i<n;i++)saw+=`L${x+i*sw} ${top} L${x+i*sw} ${top-14} L${x+(i+1)*sw} ${top} `;
-  return `<path d="M${x} ${top} ${saw} L${x+w} ${top}Z" fill="var(--roof)"/><rect x="${x}" y="${top}" width="${w}" height="${h}" fill="${col}"/>${win}<rect x="${x+w/2-10}" y="${146}" width="20" height="24" rx="2" fill="var(--roof)"/>`;}
-function chimney(x,top){return `<rect x="${x}" y="${top}" width="12" height="${170-top}" fill="#6b5a52"/><rect x="${x-2}" y="${top}" width="16" height="5" fill="#4b3d37"/>
-  <circle class="smoke" cx="${x+6}" cy="${top-6}" r="6" fill="#ddd" /><circle class="smoke" style="animation-delay:-1.5s" cx="${x+8}" cy="${top-8}" r="5" fill="#ddd"/>`;}
+  return `<path d="M${x} ${top} ${saw} L${x+w} ${top}Z" fill="${roof||SC.roof}"/><rect x="${x}" y="${top}" width="${w}" height="${h}" fill="${col}"/>${win}<rect x="${x+w/2-10}" y="146" width="20" height="24" rx="2" fill="${roof||SC.roof}"/>`;}
+function chimney(x,top,spark){return `<rect x="${x}" y="${top}" width="12" height="${170-top}" fill="#6b5a52"/><rect x="${x-2}" y="${top}" width="16" height="5" fill="#4b3d37"/>
+  <circle class="smoke" cx="${x+6}" cy="${top-6}" r="6" fill="#ddd"/><circle class="smoke" style="animation-delay:-1.5s" cx="${x+8}" cy="${top-8}" r="5" fill="#ddd"/>`+
+  (spark?[0,1,2].map(k=>`<circle class="spark" style="animation-delay:-${k*.4}s" cx="${x+4+k*2}" cy="${top-2}" r="1.3" fill="#ffb02e"/>`).join(''):'');}
+const tier=l=>l>=50?3:l>=25?2:l>=10?1:0;
+const hit=(i,x,y,w,h)=>`<rect class="hitb" x="${x}" y="${y}" width="${w}" height="${h}" fill="transparent"/>`;
+function gear(cx,cy,r){return `<g transform="translate(${cx} ${cy})"><g class="spin"><circle r="${r}" fill="#9aa3a0" stroke="#4b5260" stroke-width="1.5"/>${[0,60,120].map(a=>`<rect x="${-r}" y="-1" width="${2*r}" height="2" fill="#4b5260" transform="rotate(${a})"/>`).join('')}<circle r="${r*.3}" fill="#4b5260"/></g></g>`;}
+function bMachining(t){const [x]=DX[1];let s=hall(x,96,54,'#b5453a');s+=`<rect x="${x+8}" y="${170-54+30}" width="${80}" height="20" rx="2" fill="#3b2a24"/>`;
+  for(let k=0;k<=Math.min(2,t);k++)s+=gear(x+22+k*26,170-54+40,7);return s+hit(1,x,100,96,70);}
+function bAssembly(t){const [x]=DX[2],w=130,h=60,top=170-h;let s=hall(x,w,h,'#c0623f');
+  s+=`<rect x="${x+10}" y="${top+28}" width="${w-20}" height="28" rx="2" fill="#3b2a24"/><rect x="${x+12}" y="${top+50}" width="${w-24}" height="4" fill="#6b5a52"/>`;
+  s+=`<g clip-path="url(#acl)"><g class="belt">${[0,1,2,3].map(k=>`<use href="#pmp" x="${x+4+k*36}" y="${top+51}"/>`).join('')}</g></g>`;
+  for(let k=0;k<=Math.min(2,t);k++){const ax=x+30+k*36;s+=`<rect x="${ax-4}" y="${top+44}" width="8" height="6" fill="#ffc23d"/><g transform="translate(${ax} ${top+44})"><g class="swing" style="animation-delay:-${k*.5}s"><rect x="-1.6" y="-14" width="3.2" height="14" fill="#ffc23d"/><rect x="-3" y="-16" width="6" height="3" fill="#4b5260"/></g></g>`;}
+  return s+hit(2,x,90,w,80);}
+function bTest(t){const [x]=DX[3];let s='';const tanks=t>=2?2:1;
+  for(let k=0;k<tanks;k++){const tx=x+4+k*26;s+=`<rect x="${tx}" y="128" width="24" height="42" fill="#6d8fa8"/><ellipse cx="${tx+12}" cy="128" rx="12" ry="4" fill="#8fb0c8"/><rect x="${tx+2}" y="138" width="20" height="3" fill="#56778f"/>`;}
+  const px=x+56;s+=`<rect x="${px-4}" y="158" width="40" height="4" fill="#4b5260"/><g transform="translate(${px} 162) scale(.32)">${PUMP}</g>`;
+  s+=`<path class="flow" d="M${px+30} 146 q-8 -22 -${px+30-(x+16)} -18" stroke="#6cc3ea" stroke-width="2.2" fill="none"/>`;
+  s+=`<rect x="${px+30}" y="146" width="3" height="14" fill="#4b5260"/><g transform="translate(${px+31} 136)"><circle r="8" fill="#fff" stroke="#4b5260" stroke-width="2"/><path d="M-5 3 A6 6 0 1 1 5 3" stroke="#e0342b" stroke-width="1.2" fill="none"/><g class="needle"><rect x="-.7" y="-6" width="1.4" height="6" fill="#222"/></g><circle r="1.4" fill="#222"/></g>`;
+  if(t>=1)s+=`<line x1="${x+84}" y1="170" x2="${x+84}" y2="112" stroke="#9aa3a0" stroke-width="2"/><path d="M${x+84} 113 h-14 l3 5 l-3 5 h14z" fill="#2f9e5b"/>`;
+  return s+hit(3,x,105,92,65);}
+function bShip(t){const [x]=DX[4],w=106,h=36,top=170-h;let s=`<rect x="${x}" y="${top}" width="${w}" height="${h}" fill="#8a6a52"/><rect x="${x-3}" y="${top-5}" width="${w+6}" height="6" fill="${SC.roof}"/>`;
+  const doors=2+Math.min(2,t);for(let k=0;k<doors;k++){const dx=x+8+k*(w-16)/doors;s+=`<rect x="${dx}" y="${top+10}" width="${(w-16)/doors-6}" height="${h-10}" fill="#4b3d37"/><g stroke="#6b5a52" stroke-width="1">${[0,1,2,3].map(r=>`<line x1="${dx}" y1="${top+14+r*5}" x2="${dx+(w-16)/doors-6}" y2="${top+14+r*5}"/>`).join('')}</g>`;}
+  s+=`<rect x="${x+w/2-18}" y="${top-17}" width="36" height="11" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.2"/><text x="${x+w/2}" y="${top-9}" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="7" fill="#2f9e5b">${LANG==='tr'?'SEVKİYAT':'SHIPPING'}</text>`;
+  return s+hit(4,x,top-18,w,h+18);}
+function bDealer(t){const [x]=DX[5],w=70,h=78+t*14,top=170-h;let s=`<rect x="${x}" y="${top}" width="${w}" height="${h}" fill="#3d5a80"/>`;
+  for(let r=0;r<Math.floor((h-14)/13);r++)for(let c=0;c<4;c++)s+=winR(x+7+c*15,top+8+r*13,9,7);
+  s+=`<line x1="${x+w/2}" y1="${top}" x2="${x+w/2}" y2="${top-16}" stroke="#9aa3a0" stroke-width="2"/><circle class="blink" cx="${x+w/2}" cy="${top-17}" r="2.4" fill="#e0342b"/>`;
+  s+=`<g transform="translate(${x+w-8} ${top-8})"><circle r="7" fill="#2b6cb0" stroke="#fff" stroke-width="1.4"/><g class="spin" style="animation-duration:6s"><ellipse rx="3" ry="7" fill="none" stroke="#fff" stroke-width="1"/></g><line x1="-7" y1="0" x2="7" y2="0" stroke="#fff" stroke-width="1"/></g>`;
+  return s+hit(5,x,top-20,w,h+20);}
+function worker(x,y,col,dist,dur,delay){return `<g class="walk" style="--x:${dist}px;--d:${dur}s;animation-delay:-${delay}s"><g transform="translate(${x} ${y})"><rect x="-1.6" y="-7" width="3.2" height="5" rx="1" fill="${col}"/><line x1="-1" y1="-2" x2="-1.4" y2="1" stroke="#2b3555" stroke-width="1.2"/><line x1="1" y1="-2" x2="1.4" y2="1" stroke="#2b3555" stroke-width="1.2"/><circle cy="-9" r="2" fill="#f1c09a"/><path d="M-2.4 -9.4 a2.4 2.4 0 0 1 4.8 0z" fill="#ffc23d"/></g></g>`;}
+function forklift(x,y,dist){return `<g class="walk" style="--x:${dist}px;--d:9s"><g transform="translate(${x} ${y})"><rect x="0" y="-8" width="11" height="6" rx="1" fill="#ffc23d"/><rect x="2" y="-13" width="5" height="5" fill="none" stroke="#4b3d37" stroke-width="1"/><rect x="11" y="-14" width="1.5" height="12" fill="#4b3d37"/><rect x="11" y="-4" width="6" height="1.4" fill="#4b3d37"/><rect x="12" y="-9" width="5" height="5" fill="#a5754a"/><circle cx="3" cy="-1" r="1.8" fill="#222"/><circle cx="9" cy="-1" r="1.8" fill="#222"/></g></g>`;}
+function truck(x,dist,dur,delay){return `<g class="drive" style="--x:${dist}px;--d:${dur}s;animation-delay:-${delay}s"><g transform="translate(${x} 0)"><rect x="0" y="194" width="34" height="13" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.2"/><text x="17" y="203" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="6.5" fill="#2f9e5b">PUMPZ</text><path d="M34 198 h9 l6 5 v4 h-15z" fill="#2f9e5b"/><circle cx="8" cy="208" r="3.2" fill="#222"/><circle cx="26" cy="208" r="3.2" fill="#222"/><circle cx="42" cy="208" r="3.2" fill="#222"/></g></g>`;}
+function tod(){const h=new Date().getHours();return h>=20||h<5?'night':h<8?'dawn':h<17?'day':'eve';}
+const SKY={day:['#ffcf6e','#fff0cf'],dawn:['#ffb48a','#ffe6c8'],eve:['#ff8a5c','#ffd09a'],night:['#1c1838','#4a3560']};
+function camW(){const st=stageIdx();let w=360;S.lv.forEach((l,i)=>{if(l>0&&i>0)w=Math.max(w,DX[i][1]+18);});if(st>=4)w=Math.max(w,1000);return w;}
+let camCur=0,camAnim=0;
+function setCam(w,anim){const go=v=>{const h=v*215/360,y0=170-(.79+Math.min(.08,(v-360)/640*.08))*h;$('svg').setAttribute('viewBox',`0 ${y0.toFixed(1)} ${v.toFixed(1)} ${h.toFixed(1)}`);};
+  cancelAnimationFrame(camAnim);if(!anim||!camCur||matchMedia('(prefers-reduced-motion: reduce)').matches){camCur=w;go(w);return;}
+  const a=camCur,t0=performance.now(),step=t=>{const k=Math.min(1,(t-t0)/1600),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camCur=a+(w-a)*e;go(camCur);if(k<1)camAnim=requestAnimationFrame(step);};camAnim=requestAnimationFrame(step);}
 let drawnStage=-1;
-function drawScene(){const st=stageIdx(),key=st+'-'+(S.order?'o'+(S.order.kind==='hotel'?2:S.order.p):'')+'-'+S.prod.lastIndexOf(true)+'-'+(S.deco||[]).join('.')+'-'+JSON.stringify(S.out);if(key===drawnStage)return;drawnStage=key;const SHOW=(S.order?PRODUCTS[S.order.kind==='hotel'?2:S.order.p]:PRODUCTS[S.prod.lastIndexOf(true)]).g();
+function drawScene(){const st=stageIdx(),T=tod(),key=[st,T,S.order?'o'+(S.order.kind==='hotel'?2:S.order.p):'',S.prod.lastIndexOf(true),(S.deco||[]).join('.'),JSON.stringify(S.out),S.lv.map(l=>l>0?tier(l)+1:0).join(''),Math.min(3,1+Math.floor(S.lv[4]/25))].join('|');
+  if(key===drawnStage)return;const first=drawnStage===-1;drawnStage=key;WINS=[];
+  const SHOW=(S.order?PRODUCTS[S.order.kind==='hotel'?2:S.order.p]:PRODUCTS[S.prod.lastIndexOf(true)]).g();
+  const sk=SKY[T],cel=T==='night'?`<circle cx="318" cy="36" r="15" fill="#f3ecd2"/><circle cx="312" cy="31" r="15" fill="${sk[0]}" opacity=".35"/>`+[[40,30],[90,18],[150,40],[210,22],[260,50],[120,64],[30,70]].map(([a,b])=>`<circle class="blink" style="animation-duration:${2+a%3}s" cx="${a}" cy="${b}" r="1.2" fill="#fff"/>`).join('')
+    :T==='day'?`<circle cx="320" cy="34" r="18" fill="#fff6c8" opacity=".9"/>`:T==='dawn'?`<circle cx="40" cy="96" r="20" fill="#fff1c2"/>`:`<circle cx="318" cy="100" r="22" fill="#ffd27a"/>`;
+  const clouds=T==='night'?'':[[60,40,1],[210,26,.8],[300,64,.7]].map(([cx,cy,sz],k)=>`<g class="cloud" style="animation-delay:-${k*9}s"><g transform="translate(${cx} ${cy}) scale(${sz})"><ellipse rx="18" ry="7" fill="#fff" opacity=".75"/><ellipse cx="10" cy="-4" rx="10" ry="7" fill="#fff" opacity=".75"/></g></g>`).join('');
+  $('bg').innerHTML=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk[0]}"/><stop offset="1" stop-color="${sk[1]}"/></linearGradient></defs><rect width="360" height="215" fill="url(#sk)"/>${cel}${clouds}`;
   let b='';
-  if(st>=4)b+=`<rect x="196" y="22" width="34" height="148" fill="#3d5a80"/>`+Array.from({length:7},(_,i)=>`<rect x="201" y="${30+i*19}" width="24" height="9" fill="#ffe7a3"/>`).join('')+`<circle cx="213" cy="14" r="9" fill="#2b6cb0" stroke="#fff" stroke-width="2"/>`;
-  if(st>=2)b+=hall(150,60,50,'#b5453a');
-  if(st>=3)b+=`<rect x="128" y="92" width="16" height="78" fill="#8a8f98"/><ellipse cx="136" cy="92" rx="11" ry="5" fill="#a9aeb6"/><rect x="128" y="104" width="16" height="4" fill="#e0342b"/>`;
-  const W=[95,120,125,130,135][st];
-  b+=st>=1?chimney(30,62):'';b+=st>=3?chimney(54,72):'';
-  b+=hall(16,W,[44,62,66,70,74][st],'var(--hall)');
-  const top=170-[44,62,66,70,74][st];
-  if(hasD(5))for(let x=20;x<16+W-16;x+=20)b+=`<path d="M${x} ${top-3} l6 -11 h12 l-6 11z" fill="#24407a" stroke="#9fb4e0" stroke-width=".8"/>`;
+  if(st>=3)b+=[400,470,560,650,760,860].map((x,k)=>`<rect x="${x}" y="${104+k%2*10}" width="${60+k%3*12}" height="${66-k%2*10}" fill="#c99a62" opacity=".45"/>`).join('');
+  b+=`<path d="M-200 150 q120 -34 240 -6 t260 -8 t260 2 t260 -6 t240 4 V172 H-200z" fill="${SC.ground2}" opacity=".5"/>`;
+  if(st>=4)b+=`<g class="bld" data-dept="5"><rect x="940" y="20" width="46" height="150" fill="#2f4a6e"/>${Array.from({length:10},(_,r)=>[0,1,2].map(c=>winR(946+c*13,28+r*13,8,7)).join('')).join('')}<circle cx="963" cy="12" r="9" fill="#2b6cb0" stroke="#fff" stroke-width="2"/><rect x="944" y="150" width="38" height="10" rx="2" fill="#fff"/><text x="963" y="158" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="7" fill="#e0342b">${LANG==='tr'?'PUMPZ MERKEZ':'PUMPZ HQ'}</text></g>`;
+  const W=[95,120,125,130,135][st],Hh=[44,62,66,70,74][st],top=170-Hh,t0=tier(S.lv[0]);
+  let f='';if(S.lv[0]>0)f+=chimney(30,62-t0*6,true);if(t0>=2||st>=3)f+=chimney(54,72,true);
+  f+=hall(16,W,Hh,SC.hall);if(S.lv[0]>0)f+=`<rect class="glow" x="${16+W/2-9}" y="149" width="18" height="21" rx="2" fill="#ff7a1a"/>`;
+  if(hasD(5))for(let x=20;x<16+W-16;x+=20)f+=`<path d="M${x} ${top-3} l6 -11 h12 l-6 11z" fill="#24407a" stroke="#9fb4e0" stroke-width=".8"/>`;
+  f+=`<rect x="${16+W/2-40}" y="${top-34}" width="80" height="18" rx="4" fill="#fff" stroke="#e0342b" stroke-width="2"/><text x="${16+W/2}" y="${top-21}" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="11" fill="#e0342b">PUMPZ</text>`;
+  b+=`<g class="bld" data-dept="0">${f}${S.lv[0]>0?hit(0,16,top-34,W,Hh+34):''}</g>`;
+  const B=[null,bMachining,bAssembly,bTest,bShip,bDealer];for(let i=1;i<6;i++)if(S.lv[i]>0)b+=`<g class="bld" data-dept="${i}">${B[i](tier(S.lv[i]))}</g>`;
   if(hasD(1))b+='<rect x="229" y="140" width="7" height="28" fill="#7b4a2a"/><circle cx="222" cy="136" r="10" fill="#2f8a44"/><circle cx="243" cy="136" r="10" fill="#2f8a44"/><circle cx="232" cy="126" r="15" fill="#3f9d4f"/>';
   if(hasD(6))b+=`<rect x="248" y="154" width="22" height="14" fill="#b8b0a3"/><rect x="246" y="152" width="26" height="4" fill="#cfc8bb"/><g transform="translate(259 152) scale(.3)">${GOLD}</g>`;
   if(hasD(2))b+='<line x1="352" y1="168" x2="352" y2="90" stroke="#9aa3a0" stroke-width="3"/><circle cx="352" cy="89" r="2.5" fill="#ffc23d"/><path d="M350 93 h-26 l4 9 l-4 9 h26z" fill="#2f9e5b"/><text x="338" y="106" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="9" fill="#fff">PZ</text>';
-  b+=`<rect x="${16+W/2-40}" y="${top-34}" width="80" height="18" rx="4" fill="#fff" stroke="#e0342b" stroke-width="2"/><text x="${16+W/2}" y="${top-21}" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="11" fill="#e0342b">PUMPZ</text>`;
-  $('svg').innerHTML=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient>
-  <g id="pmp" transform="scale(.27)">${PUMP}</g>
-  <clipPath id="bc"><rect x="0" y="170" width="178" height="30"/></clipPath></defs>
-  <rect width="360" height="215" fill="url(#sk)"/><circle cx="320" cy="34" r="18" fill="#fff6c8" opacity=".9"/>
-  <path d="M0 150 q60 -30 120 -4 t130 -6 t110 0 V170 H0z" fill="var(--ground)" opacity=".45"/>
-  ${b}<rect y="168" width="360" height="47" fill="var(--ground)"/>
+  const open=S.lv.filter(l=>l>0).length,WK=['#2f3e6e','#e0342b','#2f9e5b','#2b6cb0','#7b3fa0','#d4a017'];
+  let mv='';for(let k=0;k<Math.min(6,open+(st>=1?1:0));k++){const x0=[150,390,500,640,740,860][k]||200;mv+=worker(x0,176+k%2*3,WK[k],30+k*8,4+k*.7,k*1.3);}
+  if(S.lv[2]>0)mv+=forklift(470,182,90);
+  let tr='';if(S.lv[4]>0){const n=Math.min(3,1+Math.floor(S.lv[4]/25));for(let k=0;k<n;k++)tr+=truck(730,700,9+k,k*3.2);}
+  const lit=WINS.map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="#ffd36b"/>`).join('');
+  const sc=$('scene');sc.dataset.tod=T;
+  $('svg').innerHTML=`<defs><g id="pmp" transform="scale(.27)">${PUMP}</g><clipPath id="bc"><rect x="0" y="170" width="178" height="30"/></clipPath><clipPath id="acl"><rect x="${DX[2][0]+12}" y="100" width="106" height="70"/></clipPath></defs>
+  ${b}<rect x="-300" y="168" width="1700" height="600" fill="${SC.ground}"/>${S.lv[4]>0||st>=2?`<rect x="356" y="198" width="1100" height="16" fill="#a9a29a"/><g stroke="#fff" stroke-width="1.4" stroke-dasharray="8 8"><line x1="356" y1="206" x2="1456" y2="206"/></g>`:''}
   <rect x="6" y="186" width="174" height="8" rx="4" fill="#4b3d37"/>
   ${hasD(0)?'<rect x="6" y="207" width="62" height="7" rx="3" fill="#7b4a2a"/>'+[12,22,32,42,52,62].map((x,i)=>`<line x1="${x}" y1="208" x2="${x}" y2="201" stroke="#2f7d4f" stroke-width="1.5"/><circle cx="${x}" cy="200" r="3.6" fill="${['#e0342b','#ffc23d','#ff8fb1'][i%3]}"/><circle cx="${x}" cy="200" r="1.2" fill="#fff6c8"/>`).join(''):''}
   ${hasD(3)?'<ellipse cx="98" cy="209" rx="20" ry="5" fill="#9aa3a0"/><ellipse cx="98" cy="208" rx="16" ry="3" fill="#6cc3ea"/><rect x="96" y="198" width="4" height="10" fill="#9aa3a0"/><path class="spray" d="M98 198 q-8 -6 -14 8 M98 198 q8 -6 14 8 M98 198 v-4" stroke="#6cc3ea" stroke-width="2" fill="none"/>':''}
   ${hasD(4)?'<rect x="128" y="197" width="34" height="14" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.5"/><text x="145" y="207" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="9" fill="#2f9e5b">PZ</text><path d="M162 201 h10 l6 5 v5 h-16z" fill="#2f9e5b"/><rect x="166" y="203" width="6" height="3" fill="#cfe9ff"/><circle cx="136" cy="212" r="3.5" fill="#222"/><circle cx="154" cy="212" r="3.5" fill="#222"/><circle cx="172" cy="212" r="3.5" fill="#222"/>':''}
+  ${tr}${mv}
   <g id="ship" class="ship"><rect x="0" y="192" width="40" height="16" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.5"/><text x="20" y="203" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="8" fill="#2f9e5b">PUMPZ</text><path d="M40 197 h11 l7 6 v5 h-18z" fill="#2f9e5b"/><rect x="44" y="199" width="7" height="4" fill="#cfe9ff"/><circle cx="9" cy="209" r="4" fill="#222"/><circle cx="29" cy="209" r="4" fill="#222"/><circle cx="50" cy="209" r="4" fill="#222"/></g>
   <g clip-path="url(#bc)"><g class="belt" id="belt">${Array.from({length:5},(_,i)=>`<use href="#pmp" x="${-50+i*70}" y="187"/>`).join('')}</g></g>
   <ellipse cx="228" cy="209" rx="40" ry="4" fill="#0003"/><g transform="translate(190 209) scale(.84)"><g id="bigp" class="bigp">${SHOW}</g></g>
-  <g transform="translate(305 208) scale(.82)"><g id="nec" style="cursor:pointer">${erol()}</g></g>`;
+  <g transform="translate(305 208) scale(.82)"><g id="nec" style="cursor:pointer">${erol()}</g></g>
+  <rect class="tint" x="-300" y="-900" width="1800" height="1800" fill="${T==='night'?'#120e33':T==='eve'?'#ff5a2a':'#ff9a6a'}"/><g class="lit">${lit}</g>`;
+  setCam(camW(),!first);
   $('nec').addEventListener('click',e=>{e.stopPropagation();S.nt++;jump();if(!$('bubble').classList.contains('on'))say(QUOTES[Math.random()*QUOTES.length|0],'OK',null);});
 }
+function openDept(i){if(tab!=='d'){tab='d';document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab==='d'));$('multBox').style.display='';$('tabNote').style.display='none';}
+  renderList();const it=$('list').children[i];if(!it)return;it.scrollIntoView({behavior:'smooth',block:'center'});it.classList.remove('flash');void it.offsetWidth;it.classList.add('flash');sfx('pop');}
+
 $('mNec').innerHTML=erol();
 $('sicoSvg').innerHTML=PUMP;if(LANG==='tr')$('scene').setAttribute('aria-label','Pompa üretmek için fabrikaya dokun');{const sp=$('splash'),hide=()=>sp.classList.add('out');setTimeout(hide,1800);sp.addEventListener('click',hide);}
 $('tap').insertAdjacentHTML('afterbegin',`<svg viewBox="-4 -56 96 58" aria-hidden="true">${PUMP}</svg>`);
@@ -587,7 +658,7 @@ function floatText(t,xp,yp){const s=document.createElement('span');s.className='
 
 /* ---------- tapping ---------- */
 function tapAt(xp,yp){S.taps++;sfx('tap',8);const bp=$('bigp');if(bp){bp.classList.remove('pulse');void bp.getBBox();bp.classList.add('pulse');}const p=tapPow(),ob=ordBusy();produce(p,true);floatText(ob?'+'+fmt(p)+' work':'+'+fmtM(p*price()),xp,yp);updateUI();}
-$('scene').addEventListener('click',e=>{const r=$('scene').getBoundingClientRect();tapAt((e.clientX-r.left)/r.width*100-6,(e.clientY-r.top)/r.height*100-10);});
+$('scene').addEventListener('click',e=>{const bd=e.target.closest&&e.target.closest('[data-dept]');if(bd&&bd.querySelector('.hitb')){openDept(+bd.dataset.dept);return;}const r=$('scene').getBoundingClientRect();tapAt((e.clientX-r.left)/r.width*100-6,(e.clientY-r.top)/r.height*100-10);});
 $('tap').addEventListener('click',()=>tapAt(30+Math.random()*30,45));
 
 /* ---------- lists ---------- */
@@ -882,7 +953,7 @@ function tick(){const now=performance.now(),dt=Math.min(1,(now-lastT)/1000);last
   const st=stageIdx();if(st>lastStage){lastStage=st;drawScene();modal('You are now a '+STAGES[st][1]+'!','Mr. Erol: "I told you so! I built this company. You helped a little too."','Hooray');}
   if(!gameOn){if(fairT>0){if(!ordBusy())fairT-=dt;if(fairT<=0){fairT=0;S.nextFair=150+Math.random()*90;}}else if(has('fair')){S.nextFair-=dt;if(S.nextFair<=0){fairT=25;sfx('badge');toast('The trade fair is open! Join below the factory.');}}}
   if(!gameOn&&has('mor')&&S.mor>50)S.mor=Math.max(50,S.mor-dt/45);
-  fairUI();achAcc+=dt;if(achAcc>.9){if(tab==='d'&&ordBusy()){pvAcc=(pvAcc||0)+1;if(pvAcc%2===0)renderList();}checkStory();morUI();updateTasks();unlocks(true);}if(achAcc>1){achAcc=0;checkAch();}
+  fairUI();achAcc+=dt;if(achAcc>.9){if(tod()!==$('scene').dataset.tod)drawScene();if(tab==='d'&&ordBusy()){pvAcc=(pvAcc||0)+1;if(pvAcc%2===0)renderList();}checkStory();morUI();updateTasks();unlocks(true);}if(achAcc>1){achAcc=0;checkAch();}
   updateUI();saveAcc+=dt;if(saveAcc>5){saveAcc=0;save();}}
 
 let noSave=false;function save(){if(noSave)return;S.last=Date.now();store.set('pompaFab',JSON.stringify(S));}
