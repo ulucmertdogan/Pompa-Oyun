@@ -38,7 +38,7 @@ h1{font-size:clamp(22px,6.5vw,30px);line-height:1;margin:0;color:var(--red);font
 .prog{height:8px;border-radius:9px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;background:var(--yel);border-radius:9px;transition:width .3s}
 .plabel{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-top:4px}
 .scene{position:relative;aspect-ratio:360/215;border-radius:22px;overflow:hidden;box-shadow:0 6px 0 var(--line);cursor:pointer;touch-action:pan-y}
-.scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene>svg{position:absolute;inset:0;width:100%;height:100%;display:block}#rfig{display:flex;flex-direction:column;align-items:center}#rfig svg{display:block}
 .smoke{animation:smoke 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes smoke{from{transform:translateY(0) scale(.6);opacity:.8}to{transform:translateY(-30px) scale(1.6);opacity:0}}
 .belt{animation:belt 2s linear infinite}
@@ -58,6 +58,22 @@ h1{font-size:clamp(22px,6.5vw,30px);line-height:1;margin:0;color:var(--red);font
 .bubble{position:absolute;right:30%;top:6%;max-width:62%;background:#fff;color:#2b1d14;border-radius:16px;padding:10px 12px;font-size:14px;font-weight:700;box-shadow:0 4px 0 #0002;display:none;cursor:default}
 .bubble::after{content:"";position:absolute;right:-9px;bottom:16px;border:9px solid transparent;border-left-color:#fff;border-right:0}
 .bubble.on{display:block;animation:pop .25s ease-out}
+.bubble.ch{left:3%;right:3%;top:4%;max-width:none;max-height:92%;overflow:auto;font-size:13px;line-height:1.35;padding:9px 11px}.bubble.ch::after{display:none}.bubble.ch .bch button{min-height:34px;font-size:13px;padding:0 12px}
+.bch{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.bch button{margin-top:0}.bch button.ghost{background:#efe6dc;color:#3a2a20;box-shadow:0 3px 0 #d8c9b8}#btxt{white-space:pre-line}
+.skyb.hid{opacity:0}.skyb.rise{animation:skyR 2.2s ease-out both}@keyframes skyR{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+.beacon{animation:bcn 1.8s ease-in-out infinite}@keyframes bcn{50%{opacity:.35}}
+.upfx rect{animation:upF .7s ease-out forwards}@keyframes upF{0%{opacity:0}30%{opacity:.55}100%{opacity:0}}
+.upfx circle{transform-box:fill-box;transform-origin:center;animation:upS .8s ease-out forwards}@keyframes upS{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+@media(prefers-reduced-motion:reduce){.skyb.rise,.beacon,.upfx circle{animation:none}}
+.selin{position:absolute;left:24%;bottom:9%;z-index:3;display:none;flex-direction:column;align-items:center;background:none;border:0;box-shadow:none;padding:0;min-height:0;cursor:pointer;color:inherit}.selin.on{display:flex;animation:rzIn .4s ease-out}#sfig{display:flex;align-items:flex-end}.selin .rbub{white-space:normal;max-width:170px;font-size:12px}#sfig svg{display:block}
+.ex-h,.ex-s{display:none}.xh .ex-n,.xs .ex-n{display:none}.xh .ex-h,.xs .ex-s{display:inline}
+.blinkL{animation:bcn .7s ease-in-out infinite}
+.riza{position:absolute;left:3%;bottom:9%;z-index:3;display:none;flex-direction:column;align-items:center;pointer-events:none}.riza.on{display:flex;animation:rzIn .4s ease-out}
+@keyframes rzIn{from{transform:translateX(-60px);opacity:0}}.riza.bob #rfig{animation:rzB .3s ease-out}@keyframes rzB{40%{transform:translateY(-6px)}}
+.rbub{background:#fff;color:#2b1d14;font:800 12px/1.25 Nunito,system-ui,sans-serif;padding:5px 9px;border-radius:10px;max-width:160px;margin-bottom:3px;box-shadow:0 2px 0 #0002;text-align:center}.rbub:empty{display:none}
+.cup{position:absolute;left:5%;bottom:7%;z-index:4;display:none;background:none;border:0;box-shadow:none;padding:4px;min-height:0;cursor:pointer}.cup.on{display:block}
+.cup .steam path{animation:stm 2s ease-in-out infinite}.cup .steam path+path{animation-delay:.6s}@keyframes stm{0%{opacity:0;transform:translateY(4px)}50%{opacity:.9}100%{opacity:0;transform:translateY(-4px)}}
+.note.law{margin:0 0 6px;text-align:left;color:#7b3fa0;font-weight:700}
 .bubble #bbtn2{margin-left:6px;background:#efe6dc;color:#3a2a20;box-shadow:0 3px 0 #d8c9b8}.bubble button{margin-top:8px;min-height:38px;font-size:14px;padding:0 14px}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 button{font:800 16px Nunito,sans-serif;border:0;border-radius:14px;min-height:46px;padding:0 14px;cursor:pointer;touch-action:manipulation;background:var(--red);color:#fff;box-shadow:inset 0 -4px 0 #0003;white-space:nowrap}
@@ -232,7 +248,10 @@ html,body{overscroll-behavior:none}html{touch-action:manipulation;-webkit-text-s
   <div class="scene" id="scene" aria-label="Tap the factory to build pumps">
     <svg viewBox="0 0 360 215" id="bg" aria-hidden="true"></svg><svg viewBox="0 0 360 215" id="svg"></svg>
     <div class="boostTag" id="boostTag"></div><button class="camB" id="camB" aria-label="Camera">⤢ All</button>
-    <div class="bubble" id="bubble"><div id="btxt"></div><button id="bbtn">OK</button><button id="bbtn2" class="ghost" style="display:none"></button></div>
+    <div class="bubble" id="bubble"><div id="btxt"></div><button id="bbtn">OK</button><button id="bbtn2" class="ghost" style="display:none"></button><div class="bch" id="bch" style="display:none"></div></div>
+    <button class="selin" id="selin" aria-label="Selin"><div class="rbub" id="sbub"></div><div id="sfig"></div></button>
+    <div class="riza" id="riza"><div class="rbub" id="rbub"></div><div id="rfig"></div></div>
+    <button class="cup" id="cup" aria-label="Coffee"><svg viewBox="0 0 40 44" width="34" height="38"><g class="steam" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".85"><path d="M14 14 q-4 -5 0 -10"/><path d="M22 14 q-4 -5 0 -10"/></g><path d="M6 18 h24 v12 a10 10 0 0 1 -10 10 h-4 a10 10 0 0 1 -10 -10z" fill="#fff" stroke="#7b4a2b" stroke-width="2"/><path d="M30 22 a5 5 0 0 1 0 10" fill="none" stroke="#7b4a2b" stroke-width="2.4"/><ellipse cx="18" cy="19" rx="11" ry="2.4" fill="#6b3d22"/><ellipse cx="18" cy="42" rx="15" ry="2" fill="#0003"/></svg></button>
   </div>
   <button class="nxt" id="nxt"><span class="nxI" id="nxI">▶</span><span class="nxT" id="nxT"></span><i class="nxP" id="nxP"></i></button>
   <button class="tap" id="tap">Build pump</button>
@@ -454,22 +473,11 @@ const STAFF_EV=[
  [6,'IT Metin fixed the sales website. Orders are pouring in!','Nice',()=>{const g=Math.max(300,income()*60);gain(g);return '+'+fmtM(g)}],
  [7,'Loveyar Begüm, our lawyer, found a late-payment clause. The client pays a penalty to us!','Collect',()=>{const g=Math.max(500,income()*90);gain(g);return '+'+fmtM(g)}],
  [7,'Loveyar Begüm: "Mr. Erol, you cannot sign contracts with a crayon." Fair point.','Noted',()=>{const g=Math.max(200,income()*30);gain(g);return '+'+fmtM(g)}]];
-const BAD=[
- ()=>{if(S.money<500)return false;sfx('bad',40);const fee=S.money*.02;
-   const risk=()=>{if(Math.random()<.5){toast(LL('The spies left empty-handed. Lucky!','Casuslar eli boş döndü. Şanslıyız!'));sfx('win');return null;}
-     const l=Math.max(0,S.money)*(.05+Math.random()*.05);S.money-=l;S.sent=Math.max(.5,(S.sent||1)-.08);sfx('bad',60);toast(LL('Spies stole our pump designs: −'+fmtM(l),'Casuslar pompa tasarımlarımızı çaldı: −'+fmtM(l)));return null;};
-   if(S.emp[7])say(LL('A spy was spotted near the design office! Loveyar Begüm can stop them in court, free of charge.','Tasarım ofisinin önünde bir casus görüldü! Loveyar Begüm mahkemeden ücretsiz durdurabilir.'),LL('Begüm, handle it','Begüm halletsin'),()=>{toast(LL('Loveyar Begüm got an injunction. Designs are safe.','Loveyar Begüm tedbir kararı aldı. Tasarımlar güvende.'));return LL('Protected','Korundu');},LL('Risk it','Risk al'),risk);
-   else say(LL('A spy was spotted near the design office! Hire security for '+fmtM(fee)+', or take the risk: 50% chance of losing 5–10% of cash. No answer means we take the risk.','Tasarım ofisinin önünde bir casus görüldü! '+fmtM(fee)+' ile güvenlik al ya da riske gir: %50 ihtimalle paranın %5–10\'u gider. Cevap vermezsen risk alınır.'),LL('Hire security','Güvenlik al'),()=>{S.money-=fee;return LL('Protected','Korundu');},LL('Risk it','Risk al'),risk);
-   return true;},
- ()=>{const ok=S.lv.map((l,i)=>l>0?i:-1).filter(i=>i>=0);if(!ok.length||S.brk||ordBusy())return false;const i=ok[Math.random()*ok.length|0],c=Math.max(200,income()*20);S.brk={i,t:60};sfx('bad',60);renderList();
-   const why=['Cavitation','A seal is leaking','The motor overheated','A bearing is screaming'][Math.random()*4|0];
-   say(why+' at '+DEPTS[i].n+'! It runs at half speed until repaired. Repair now for '+fmtM(c)+', or wait 60 s.','Repair',()=>{S.money-=c;S.brk=null;renderList();return 'Repaired';});return true;},
- ()=>{if(ordBusy())return false;if(has('mor')){S.mor=Math.max(0,S.mor-25);say('The workers are on strike over coffee quality! Team morale dropped 25%.','I will fix it',null);}else{boost(.5,30);say('The workers are on strike over coffee quality! Production is halved for 30 seconds.','I will fix it',null);}sfx('bad',60);return true;},
- ()=>{if(income()<5)return false;const c=Math.max(100,income()*45);S.money-=c;sfx('bad',60);say('Customs held our shipment and charged a storage fee of '+fmtM(c)+'.','Pay',null);return true;}];
+const BAD=[()=>spyEv()];
 const EVENTS=[
  {t:'I played golf with a client and landed a big deal!',b:'Collect',f:()=>{const g=Math.max(200,income()*60);gain(g);return '+'+fmtM(g)}},
  {t:'I held a motivation meeting! Everyone works twice as fast for 30 seconds.',b:'Awesome!',f:()=>{boost(2,30)}},
- {t:'I bought cake for everyone! You pay the bill, but production is ×3 for 20 seconds.',b:'Okay...',f:()=>{if(S.money>0)S.money*=.95;boost(3,20)}},
+ {t:'I bought cake for everyone! You pay the bill, but production is ×3 for 20 seconds.',b:'Okay...',run:()=>{const bill=Math.max(0,S.money*.05);sayC(LL('I bought cake for everyone! The bill is '+fmtM(bill)+'. If you pay, production is ×3 for 20 seconds.','Herkese pasta aldım! Hesap '+fmtM(bill)+'. Ödersen 20 saniye boyunca üretim ×3.'),[[LL('Pay, let\'s celebrate','Öde, kutlayalım'),()=>{S.money-=bill;boost(3,20);return '×3';}],[LL('Pass','Pas'),null,true]]);}},
  {t:'I bought myself a "World\'s Best Boss" trophy. Celebration bonus!',b:'Congrats(!)',f:()=>{const g=Math.max(100,income()*25);gain(g);return '+'+fmtM(g)}},
  {t:'I accidentally added an extra zero to the price list. Nobody noticed!',b:'Shhh...',f:()=>{const g=Math.max(300,income()*90);gain(g);return '+'+fmtM(g)}}];
 
@@ -482,7 +490,7 @@ function fmt(n){if(n<1000)return (n<10&&n%1?n.toFixed(1):Math.floor(n)).toString
   const u=LANG==='tr'?[' bin',' Mn',' Mr',' Tn',' Kt',' Kn']:['K','M','B','T','Qa','Qi'];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}
   return n.toLocaleString(LANG==='tr'?'tr-TR':'en-US',{maximumFractionDigits:n<100?2:1})+u[i];}
 const fmtM=n=>(n<0?'−':'')+'₺'+fmt(Math.abs(n));
-const effMul=k=>EMPS.reduce((m,e,i)=>S.emp[i]&&e.k===k?m*e.v:m,1);
+const effMul=k=>EMPS.reduce((m,e,i)=>S.emp[i]&&e.k===k?m*e.v:m,1);const lawOn=()=>!!(S.emp[7]&&S.lawT>0),ordMul=()=>effMul('order')/(lawOn()?2:1);
 const tapPow=()=>effMul('tap');
 const prodMul=()=>PRODUCTS.reduce((m,p,i)=>S.prod[i]?m*p.m:m,1);
 const price=()=>10*effMul('price')*prodMul();
@@ -600,11 +608,13 @@ const EROL=`<g class="bob"><rect x="-15" y="-30" width="11" height="28" rx="3" f
 <g class="wave"><ellipse cx="32" cy="-66" rx="7.5" ry="17" fill="#2f3e6e" transform="rotate(-35 32 -66)"/><circle cx="41" cy="-82" r="6.5" fill="#f1c09a"/></g>
 <circle cx="-22" cy="-97" r="5" fill="#f1c09a"/><circle cx="22" cy="-97" r="5" fill="#f1c09a"/><circle cy="-99" r="22" fill="#f1c09a"/>
 <ellipse cx="-19" cy="-102" rx="6" ry="9" fill="#4a3426"/><ellipse cx="19" cy="-102" rx="6" ry="9" fill="#4a3426"/><ellipse cx="-6" cy="-115" rx="6" ry="3" fill="#fff" opacity=".55"/>
-<path d="M-14 -108 q5 -4 10 0 M4 -108 q5 -4 10 0" stroke="#4a3426" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-<ellipse cx="-8" cy="-100" rx="3" ry="3.8" fill="#222"/><ellipse cx="8" cy="-100" rx="3" ry="3.8" fill="#222"/><circle cx="-7" cy="-101.5" r="1" fill="#fff"/><circle cx="9" cy="-101.5" r="1" fill="#fff"/>
+<g class="ex-n"><path d="M-14 -108 q5 -4 10 0 M4 -108 q5 -4 10 0" stroke="#4a3426" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<ellipse cx="-8" cy="-100" rx="3" ry="3.8" fill="#222"/><ellipse cx="8" cy="-100" rx="3" ry="3.8" fill="#222"/><circle cx="-7" cy="-101.5" r="1" fill="#fff"/><circle cx="9" cy="-101.5" r="1" fill="#fff"/></g>
+<g class="ex-h"><path d="M-14 -112 q5 -5 10 0 M4 -112 q5 -5 10 0" stroke="#4a3426" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M-11 -99 q3 -5 6 0 M5 -99 q3 -5 6 0" stroke="#222" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="-14" cy="-90" r="4.4" fill="#ff8a7a" opacity=".55"/><circle cx="14" cy="-90" r="4.4" fill="#ff8a7a" opacity=".55"/></g>
+<g class="ex-s"><path d="M-15 -106 l10 3 M4 -110 q5 -5 10 -1" stroke="#4a3426" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M-11 -100 h6 M5 -100.5 h6" stroke="#222" stroke-width="2.6" stroke-linecap="round"/><circle cx="-6.5" cy="-100" r="1.3" fill="#222"/><circle cx="9.5" cy="-100.5" r="1.3" fill="#222"/></g>
 <ellipse cy="-94" rx="3.8" ry="3.2" fill="#e2a37f"/><circle cx="-14" cy="-89" r="3.6" fill="#ff8a7a" opacity=".5"/><circle cx="14" cy="-89" r="3.6" fill="#ff8a7a" opacity=".5"/>
 <path d="M0 -91 c-6 -5 -16 -5 -20 2 c7 1 13 2 20 0 c7 2 13 1 20 0 c-4 -7 -14 -7 -20 -2Z" fill="#4a3426"/>
-<path d="M-8 -85 q8 8 16 0" stroke="#7a2b20" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
+<path class="ex-n" d="M-8 -85 q8 8 16 0" stroke="#7a2b20" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="ex-h" d="M-10 -86 q10 13 20 0z" fill="#7a2b20"/><path class="ex-s" d="M-6 -84 q6 -1 12 2" stroke="#7a2b20" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
 
 const OUT={hat:[['none','No hat',()=>true,''],['hard','Hard hat',()=>S.ach.length>=3,'Earn 3 badges'],['fez','Fez',()=>(S.bestFair||0)>=15,'15 deals at one fair'],['top','Top hat',()=>S.ach.length>=8,'Earn 8 badges']],
  glasses:[['none','No glasses',()=>true,''],['round','Round glasses',()=>S.tdone>=5,'Finish 5 daily tasks'],['sun','Sunglasses',()=>S.ach.length>=5,'Earn 5 badges']],
@@ -639,11 +649,13 @@ function bAssembly(t){const [x]=DX[2],w=130,h=60,top=170-h;let s=hall(x,w,h,'#c0
   s+=`<g clip-path="url(#acl)"><g class="belt">${[0,1,2,3].map(k=>`<use href="#pmp" x="${x+4+k*36}" y="${top+51}"/>`).join('')}</g></g>`;
   for(let k=0;k<=Math.min(2,t);k++){const ax=x+30+k*36;s+=`<rect x="${ax-4}" y="${top+44}" width="8" height="6" fill="#ffc23d"/><g transform="translate(${ax} ${top+44})"><g class="swing" style="animation-delay:-${k*.5}s"><rect x="-1.6" y="-14" width="3.2" height="14" fill="#ffc23d"/><rect x="-3" y="-16" width="6" height="3" fill="#4b5260"/></g></g>`;}
   return s+hit(2,x,90,w,80);}
-function bTest(t){const [x]=DX[3];let s='';const tanks=t>=2?2:1;
+function bTest(t){const [x]=DX[3];let s='';const tst=!!(S.order&&S.order.kind==='hotel'&&S.order.stage==='test');const tanks=t>=2?2:1;
   for(let k=0;k<tanks;k++){const tx=x+4+k*26;s+=`<rect x="${tx}" y="128" width="24" height="42" fill="#6d8fa8"/><ellipse cx="${tx+12}" cy="128" rx="12" ry="4" fill="#8fb0c8"/><rect x="${tx+2}" y="138" width="20" height="3" fill="#56778f"/>`;}
   const px=x+56;s+=`<rect x="${px-4}" y="158" width="40" height="4" fill="#4b5260"/><g transform="translate(${px} 162) scale(.32)">${PUMP}</g>`;
   s+=`<path class="flow" d="M${px+30} 146 q-8 -22 -${px+30-(x+16)} -18" stroke="#6cc3ea" stroke-width="2.2" fill="none"/>`;
-  s+=`<rect x="${px+30}" y="146" width="3" height="14" fill="#4b5260"/><g transform="translate(${px+31} 136)"><circle r="8" fill="#fff" stroke="#4b5260" stroke-width="2"/><path d="M-5 3 A6 6 0 1 1 5 3" stroke="#e0342b" stroke-width="1.2" fill="none"/><g class="needle"><rect x="-.7" y="-6" width="1.4" height="6" fill="#222"/></g><circle r="1.4" fill="#222"/></g>`;
+  s+=`<rect x="${px+30}" y="146" width="3" height="14" fill="#4b5260"/><g transform="translate(${px+31} 136)"><circle r="8" fill="#fff" stroke="#4b5260" stroke-width="2"/><path d="M-5 3 A6 6 0 1 1 5 3" stroke="#e0342b" stroke-width="1.2" fill="none"/>${tst||tPass?`<path d="M4.3 -2.5 L6.9 -4" stroke="#2f9e5b" stroke-width="1.6"/><g id="tbN" transform="rotate(${tPass?60:-130})">`:'<g class="needle">'}<rect x="-.7" y="-6" width="1.4" height="6" fill="#222"/></g><circle r="1.4" fill="#222"/></g>`;
+  if(tst||tPass){s+=`<path class="flow" d="M${px+8} 152 q-14 -44 -${px+8-(x+12)} -26" stroke="#4fb3e8" stroke-width="4" fill="none" opacity=".9"/>${[0,1,2,3].map(k=>`<circle class="blink" style="animation-duration:${.5+k*.15}s" cx="${x+10+k*5}" cy="${124-k%2*3}" r="1.4" fill="#bfe6ff"/>`).join('')}<rect x="${x+13}" y="118" width="6" height="6" fill="#4b5260"/>${tPass?`<circle cx="${x+16}" cy="114" r="12" fill="#3fe08a" opacity=".3"/><circle cx="${x+16}" cy="114" r="6" fill="#3fe08a"/>`:`<circle class="blinkL" cx="${x+16}" cy="115" r="4.5" fill="#ffb020"/>`}`;}
+  else if(S.tl)s+=`<rect x="${x+13}" y="119" width="5" height="5" fill="#4b5260"/><circle cx="${x+15.5}" cy="117" r="4.5" fill="#3fe08a" opacity=".22" class="beacon"/><circle cx="${x+15.5}" cy="117" r="2.4" fill="#3fe08a"/>`;
   if(t>=1)s+=`<line x1="${x+84}" y1="170" x2="${x+84}" y2="112" stroke="#9aa3a0" stroke-width="2"/><path d="M${x+84} 113 h-14 l3 5 l-3 5 h14z" fill="#2f9e5b"/>`;
   return s+hit(3,x,105,92,65);}
 function bShip(t){const [x]=DX[4],w=106,h=36,top=170-h;let s=`<rect x="${x}" y="${top}" width="${w}" height="${h}" fill="#8a6a52"/><rect x="${x-3}" y="${top-5}" width="${w+6}" height="6" fill="${SC.roof}"/>`;
@@ -674,7 +686,7 @@ function camUpdate(anim){const b=$('camB');if(b){b.style.display=camZoomable()?'
   if(pan&&pan.on)return;if(performance.now()<camHold)return;const t=camTarget();if(camTo0&&Math.abs(camTo0.x-t.x)<1&&Math.abs(camTo0.v-t.v)<1)return;if(Math.abs(camX-t.x)<1&&Math.abs(camV-t.v)<1)return;camTo(t,anim);}
 let pan=null,panned=false;
 let drawnStage=-1;
-function drawScene(){Object.assign(SC,PAL[(S.cn||0)%3]);const st=stageIdx(),T=tod(),key=[S.cn||0,st,T,S.order?'o'+(S.order.kind==='hotel'?ttOf(S.order).p:S.order.p):'',S.prod.lastIndexOf(true),(S.deco||[]).join('.'),JSON.stringify(S.out),S.lv.map(l=>l>0?tier(l)+1:0).join(''),Math.min(3,1+Math.floor(S.lv[4]/25))].join('|');
+function drawScene(){Object.assign(SC,PAL[(S.cn||0)%3]);const st=stageIdx(),T=tod(),key=[(S.order&&S.order.kind==='hotel'&&S.order.stage==='test')?'T':'',tPass?'P':'',(S.sky||[]).join('.'),S.skyIntro||'',S.tl?1:0,S.cn||0,st,T,S.order?'o'+(S.order.kind==='hotel'?ttOf(S.order).p:S.order.p):'',S.prod.lastIndexOf(true),(S.deco||[]).join('.'),JSON.stringify(S.out),S.lv.map(l=>l>0?tier(l)+1:0).join(''),Math.min(3,1+Math.floor(S.lv[4]/25))].join('|');
   if(key===drawnStage)return;const first=drawnStage===-1;drawnStage=key;WINS=[];
   const SHOW=(S.order?PRODUCTS[S.order.kind==='hotel'?ttOf(S.order).p:S.order.p]:PRODUCTS[S.prod.lastIndexOf(true)]).g();
   const sk=SKY[T],cel=T==='night'?`<circle cx="318" cy="36" r="15" fill="#f3ecd2"/><circle cx="312" cy="31" r="15" fill="${sk[0]}" opacity=".35"/>`+[[40,30],[90,18],[150,40],[210,22],[260,50],[120,64],[30,70]].map(([a,b])=>`<circle class="blink" style="animation-duration:${2+a%3}s" cx="${a}" cy="${b}" r="1.2" fill="#fff"/>`).join('')
@@ -683,6 +695,7 @@ function drawScene(){Object.assign(SC,PAL[(S.cn||0)%3]);const st=stageIdx(),T=to
   $('bg').innerHTML=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk[0]}"/><stop offset="1" stop-color="${sk[1]}"/></linearGradient></defs><rect width="360" height="215" fill="url(#sk)"/>${cel}${clouds}`;
   let b='';
   if(st>=3)b+=[400,470,560,650,760,860].map((x,k)=>`<rect x="${x}" y="${104+k%2*10}" width="${60+k%3*12}" height="${66-k%2*10}" fill="#c99a62" opacity=".45"/>`).join('');
+  b+=skyB(T);
   b+=`<path d="M-200 150 q120 -34 240 -6 t260 -8 t260 2 t260 -6 t240 4 V172 H-200z" fill="${SC.ground2}" opacity=".5"/>`;
   {const cv=(S.cn||0)%3;if(cv===1)b+=[[150,.9],[352,1],[468,.8],[930,1.1]].map(([x,z])=>`<g transform="translate(${x} 170) scale(${z})"><rect x="-3" y="-22" width="6" height="22" rx="3" fill="#4f8a3c"/><rect x="-10" y="-17" width="4" height="10" rx="2" fill="#4f8a3c"/><rect x="6" y="-20" width="4" height="10" rx="2" fill="#4f8a3c"/></g>`).join('');
    else if(cv===2)b+=[[150,1],[356,.9],[470,1.1],[932,1]].map(([x,z])=>`<g transform="translate(${x} 171) scale(${z})"><path d="M0 -28 L10 -6 H-10Z" fill="#2f6b4f"/><path d="M0 -28 L5 -17 H-5Z" fill="#fff"/><rect x="-1.5" y="-6" width="3" height="6" fill="#6b4a2b"/></g>`).join('');}
@@ -710,13 +723,14 @@ function drawScene(){Object.assign(SC,PAL[(S.cn||0)%3]);const st=stageIdx(),T=to
   ${hasD(3)?'<ellipse cx="98" cy="209" rx="20" ry="5" fill="#9aa3a0"/><ellipse cx="98" cy="208" rx="16" ry="3" fill="#6cc3ea"/><rect x="96" y="198" width="4" height="10" fill="#9aa3a0"/><path class="spray" d="M98 198 q-8 -6 -14 8 M98 198 q8 -6 14 8 M98 198 v-4" stroke="#6cc3ea" stroke-width="2" fill="none"/>':''}
   ${hasD(4)?'<rect x="128" y="197" width="34" height="14" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.5"/><text x="145" y="207" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="9" fill="#2f9e5b">PZ</text><path d="M162 201 h10 l6 5 v5 h-16z" fill="#2f9e5b"/><rect x="166" y="203" width="6" height="3" fill="#cfe9ff"/><circle cx="136" cy="212" r="3.5" fill="#222"/><circle cx="154" cy="212" r="3.5" fill="#222"/><circle cx="172" cy="212" r="3.5" fill="#222"/>':''}
   ${tr}${mv}
-  <g id="ship" class="ship"><rect x="0" y="192" width="40" height="16" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.5"/><text x="20" y="203" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="8" fill="#2f9e5b">PUMPZ</text><path d="M40 197 h11 l7 6 v5 h-18z" fill="#2f9e5b"/><rect x="44" y="199" width="7" height="4" fill="#cfe9ff"/><circle cx="9" cy="209" r="4" fill="#222"/><circle cx="29" cy="209" r="4" fill="#222"/><circle cx="50" cy="209" r="4" fill="#222"/></g>
+  <g id="ship" class="ship"><g class="cargo"></g><rect x="0" y="192" width="40" height="16" rx="2" fill="#fff" stroke="#2f9e5b" stroke-width="1.5"/><text x="20" y="203" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="8" fill="#2f9e5b">PUMPZ</text><path d="M40 197 h11 l7 6 v5 h-18z" fill="#2f9e5b"/><rect x="44" y="199" width="7" height="4" fill="#cfe9ff"/><circle cx="9" cy="209" r="4" fill="#222"/><circle cx="29" cy="209" r="4" fill="#222"/><circle cx="50" cy="209" r="4" fill="#222"/></g>
   <g clip-path="url(#bc)"><g class="belt" id="belt">${Array.from({length:5},(_,i)=>`<use href="#pmp" x="${-50+i*70}" y="187"/>`).join('')}</g></g>
   <ellipse cx="228" cy="209" rx="40" ry="4" fill="#0003"/><g transform="translate(190 209) scale(.84)"><g id="bigp" class="bigp">${SHOW}</g></g>
   <g transform="translate(305 208) scale(.82)"><g id="nec" style="cursor:pointer">${erol()}</g></g>
   <rect class="tint" x="-300" y="-900" width="1800" height="1800" fill="${T==='night'?'#120e33':T==='eve'?'#ff5a2a':'#ff9a6a'}"/><g class="lit">${lit}</g>`;
   {const op=S.lv.map(l=>l>0?1:0).join('');if(!first&&lastOpen){let nx=null;for(let i=1;i<6;i++)if(op[i]==='1'&&lastOpen[i]==='0')nx=(DX[i][0]+DX[i][1])/2;if(st>=4&&lastSt<4)nx=963;if(nx!=null){camFocusX=nx;camFocusT=performance.now()+5000;camHold=0;}}lastOpen=op;lastSt=st;}
   camUpdate(!first);
+  if(erX)$('nec').classList.add(erX);
   $('nec').addEventListener('click',e=>{e.stopPropagation();S.nt++;jump();sfx('mumble');if(!$('bubble').classList.contains('on'))say(QUOTES[Math.random()*QUOTES.length|0],'OK',null);});
 }
 function openDept(i){setSec('d',true);if(tab!=='d'){tab='d';document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab==='d'));$('multBox').style.display='';$('tabNote').style.display='none';}
@@ -729,7 +743,12 @@ function jump(){const g=$('nec');if(!g)return;g.classList.remove('jump');void g.
 
 /* ---------- Erol speech ---------- */
 let bubbleFn=null,bubbleTimer=0;
-let bubbleFn2=null;function say(t,b,fn,b2,fn2){$('btxt').textContent=t;$('bbtn').textContent=b;bubbleFn=fn;bubbleFn2=fn2||null;$('bbtn2').style.display=b2?'':'none';$('bbtn2').textContent=b2||'';bubbleTimer=fn2?20:fn?14:6;$('bubble').classList.add('on');jump();}
+let bubbleFn2=null,bchoice=false,bchK='';
+function closeB(){if(erX==='xs')setExpr('',0);$('bubble').classList.remove('on','ch');bchK='';$('bch').style.display='none';$('bch').innerHTML='';$('bbtn').style.display='';bchoice=false;bubbleFn=null;bubbleFn2=null;}
+function sayC(t,opts){$('btxt').textContent=t;$('bbtn').style.display='none';$('bbtn2').style.display='none';const c=$('bch');c.innerHTML='';
+  opts.forEach(([l,fn,gh])=>{const b=document.createElement('button');b.textContent=l;if(gh)b.className='ghost';b.addEventListener('click',e=>{e.stopPropagation();closeB();sfx(gh?'tap':'buy');const r=fn&&fn();if(r)floatText(r,60,40);renderList();bSig='';updBoard();save();});c.appendChild(b);});
+  c.style.display='';bubbleFn=null;bubbleFn2=null;bubbleTimer=25;bchoice=true;$('bubble').classList.add('on','ch');jump();}
+function say(t,b,fn,b2,fn2){$('bubble').classList.remove('ch');bchK='';$('bch').style.display='none';$('bch').innerHTML='';$('bbtn').style.display='';bchoice=false;$('btxt').textContent=t;$('bbtn').textContent=b;bubbleFn=fn;bubbleFn2=fn2||null;$('bbtn2').style.display=b2?'':'none';$('bbtn2').textContent=b2||'';bubbleTimer=fn2?20:fn?14:6;$('bubble').classList.add('on');jump();}
 $('bubble').addEventListener('click',e=>e.stopPropagation());
 $('bbtn').addEventListener('click',e=>{e.stopPropagation();const fn=bubbleFn;bubbleFn=null;$('bubble').classList.remove('on');
   if(fn){sfx('buy');const r=fn();if(r)floatText(r,60,40);renderList();save();}bubbleFn2=null;});
@@ -737,9 +756,92 @@ $('bbtn2').addEventListener('click',e=>{e.stopPropagation();const fn=bubbleFn2;b
 
 function floatText(t,xp,yp){const s=document.createElement('span');s.className='float';s.textContent=t;s.style.left=xp+'%';s.style.top=yp+'%';$('scene').appendChild(s);setTimeout(()=>s.remove(),800);}
 
+/* ---------- Selin ---------- */
+let selinWait=0,sbT=0,tPass=false,erX='',erT=0;
+function setExpr(x,ms){erX=x;const n=$('nec');if(n){n.classList.remove('xh','xs');if(x)n.classList.add(x);}clearTimeout(erT);if(x&&ms)erT=setTimeout(()=>setExpr('',0),ms);}
+function selinShow(line,ms){if(!$('sfig').innerHTML)$('sfig').innerHTML=face(EMPS[1].f,46)+'<svg viewBox="0 0 22 28" width="20" height="26" style="margin-left:-8px"><rect x="2" y="3" width="18" height="24" rx="2" fill="#c98d4a"/><rect x="5" y="7" width="12" height="17" fill="#fff"/><rect x="8" y="1" width="6" height="4" rx="1" fill="#777"/><path d="M7 11 h8 M7 15 h8 M7 19 h5" stroke="#9aa3a0" stroke-width="1.2"/></svg>';
+  $('sbub').textContent=line||'';$('selin').classList.add('on');clearTimeout(sbT);if(ms)sbT=setTimeout(()=>{$('sbub').textContent='';},ms);}
+function selinChat(){S.selinT=0;$('selin').classList.remove('on');$('sbub').textContent='';
+  const A=(t)=>()=>{say(t,LL('Got it','Anladım'),null);return null;};
+  sayC(LL('Selin: "If the pressure drops a little at night, who wakes up first?"','Selin: "Gece basınç biraz düşerse ilk kim uyanır?"'),[
+    [LL('Diesel pump','Dizel pompa'),A(LL('Selin: "We don\'t wake the diesel for a drop. Tonight the jockey is on duty."','Selin: "Dizeli bir damla için uyandırmayız. Bu sefer nöbet jokeyin."'))],
+    [LL('Electric main pump','Elektrikli ana pompa'),A(LL('Selin: "The main pump kicks in when the system really needs water. Small pressure drops are the jockey\'s job."','Selin: "Ana pompa, tesisat gerçekten su istediğinde devreye girer. Küçük basınç düşüşlerini jokey karşılar."'))],
+    [LL('Jockey pump','Jokey pompa'),A(LL('Selin: "Exactly. The night shift belongs to the jockey."','Selin: "Aynen. Gece nöbeti jokeyin."'))],
+    [LL('You tell me','Sen söyle'),A(LL('Selin: "The jockey pump. It covers small pressure drops, so the main pumps can keep sleeping."','Selin: "Jokey pompa. Küçük basınç düşüşlerini o karşılar, ana pompaları uyandırmaya gerek kalmaz."')),true]]);}
+function selinMenu(){sayC(LL('Selin: "Something you wanted to ask?"','Selin: "Bir şey mi soracaktın?"'),[[LL('How does this set work?','Bu set nasıl çalışıyor?'),()=>{setTimeout(selinChat,60);return null;}],[LL('Open Test Bench','Test Standı\'nı aç'),()=>{openDept(3);return null;}],[LL('Close','Kapat'),null,true]]);}
+$('selin').addEventListener('click',e=>{e.stopPropagation();selinChat();});
+
+/* ---------- horizon references ---------- */
+const SKYX={muni:158,hotel:205,hosp:250,dc:352,air:432};let skyRise=null;
+function skyB(T){const L=S.sky||[];if(!L.length)return '';const n=T==='night',c=n?'#2c3156':T==='eve'?'#8d7a96':'#9fb3c4',w=n?'#ffd86b':'#dbe6ee';
+  const shp={hotel:x=>`<rect x="${x-13}" y="94" width="26" height="58" fill="${c}"/><rect x="${x-9}" y="88" width="18" height="7" fill="${c}"/>${[0,1,2,3,4,5].map(r=>[0,1,2].map(q=>`<rect x="${x-9+q*7}" y="${99+r*8}" width="4" height="4" fill="${w}" opacity="${n?(r+q)%3?.9:.2:.7}"/>`).join('')).join('')}`,
+    hosp:x=>`<rect x="${x-16}" y="112" width="32" height="40" fill="${c}"/><rect x="${x-5}" y="100" width="10" height="13" fill="${c}"/><path d="M${x-2} 102 h4 v3 h3 v4 h-3 v3 h-4 v-3 h-3 v-4 h3z" fill="${n?'#ff6b6b':'#e0342b'}"/>${[0,1,2].map(r=>[0,1,2,3].map(q=>`<rect x="${x-13+q*7}" y="${117+r*9}" width="4" height="4" fill="${w}" opacity="${n?.85:.7}"/>`).join('')).join('')}`,
+    muni:x=>`<path d="M${x-8} 152 L${x-5} 118 M${x+8} 152 L${x+5} 118 M${x-7} 138 h14" stroke="${c}" stroke-width="2.4" fill="none"/><path d="M${x-12} 118 q0 -16 12 -16 q12 0 12 16z" fill="${c}"/><rect x="${x-12}" y="116" width="24" height="4" fill="${c}"/>`,
+    dc:x=>`<rect x="${x-18}" y="130" width="36" height="22" fill="${c}"/>${[-9,9].map(d=>`<path d="M${x+d-6} 130 q3 -10 0 -20 h12 q-3 10 0 20z" fill="${c}"/>`).join('')}${[0,1,2,3].map(q=>`<rect x="${x-14+q*8}" y="137" width="5" height="3" fill="${n?'#7fe0ff':w}" opacity=".8"/>`).join('')}`,
+    air:x=>`<rect x="${x-3}" y="104" width="6" height="48" fill="${c}"/><path d="M${x-11} 104 h22 l-4 -10 h-14z" fill="${c}"/><rect x="${x-9}" y="96" width="18" height="5" fill="${w}" opacity="${n?.95:.7}"/><circle cx="${x}" cy="90" r="1.8" fill="${n?'#ff6b6b':c}"/>`};
+  return L.filter(k=>shp[k]).map(k=>`<g class="skyb${S.skyIntro===k?' hid':skyRise===k?' rise':''}">${shp[k](SKYX[k])}</g>`).join('');}
+function skyIntro(){const k=S.skyIntro;if(!k)return;selinWait=performance.now()+9000;S.skyIntro=0;S.skyShown=1;skyRise=k;drawnStage=-1;drawScene();setTimeout(()=>{skyRise=null;},2500);
+  const cx=SKYX[k];camHold=performance.now()+3000;camTo({x:Math.max(0,cx-150),v:Math.min(camV||360,300)},true);
+  setTimeout(()=>{camHold=0;camUpdate(true);},3000);
+  setTimeout(()=>{if(!$('bubble').classList.contains('on'))say(LL('Mr. Erol: "See that hotel on the horizon? Its fire pumps are ours."','Erol Bey: "Ufuktaki oteli görüyor musun? Yangın pompaları bizden."'),LL('Nice','Güzel'),null);},4200);save();}
+function bldFlash(i){const g=document.querySelector('#svg [data-dept="'+i+'"]');if(!g)return;let bb;try{bb=g.getBBox();}catch(e){return;}if(!bb.width)return;
+  const fx=document.createElementNS('http://www.w3.org/2000/svg','g');fx.setAttribute('class','upfx');fx.setAttribute('pointer-events','none');
+  fx.innerHTML=`<rect x="${bb.x}" y="${bb.y}" width="${bb.width}" height="${bb.height}" rx="3" fill="#fff8c8"/>`+[0,1,2,3,4,5,6].map(k=>{const a=-Math.PI*(.1+.8*k/6);return `<circle cx="${bb.x+bb.width/2}" cy="${bb.y+4}" r="2.4" fill="${k%2?'#ffd23d':'#fff'}" style="--dx:${(Math.cos(a)*22).toFixed(1)}px;--dy:${(Math.sin(a)*18).toFixed(1)}px"/>`;}).join('');
+  $('svg').appendChild(fx);setTimeout(()=>fx.remove(),900);}
+
+/* ---------- choice events ---------- */
+const SPYJ=[['We caught the spy in the tea room. Three glasses already. A bit too relaxed, if you ask me.','Casusu çay ocağında yakaladık. Üç bardak içmiş. Bence fazla rahat.'],
+ ['A spy walked into assembly saying he is the new intern. None of our interns arrive this early.','Bir casus "yeni stajyerim" diyerek montaja girmiş. Bizim stajyerlerin hiçbiri bu kadar erken gelmez.'],
+ ['A spy was photographing our pump drawings with the flash on. Bold choice.','Bir casus pompa çizimlerimizi flaşı açık fotoğraflıyormuş. Cesur tercih.']];
+function spyEv(){const inc=income();if(inc<5||S.money<300)return false;const stake=Math.round(Math.min(Math.max(100,inc*120),S.money*.4)),p=40+5*(Math.random()*5|0),pay=stake*2.5,j=SPYJ[Math.random()*SPYJ.length|0];
+  const who=S.emp[6]?['Metin checked the cameras: ','Metin kameralara baktı: ']:['My instinct says: ','İçimden bir ses diyor ki: '];
+  const h=p>=55?['looks like an amateur.','acemiye benziyor.']:p<=45?['this one is a pro, leaves no trace.','bu profesyonel, iz bırakmıyor.']:['could go either way.','yarı yarıya.'];
+  let t=LL('Mr. Erol: "'+j[0]+'"\n'+who[0]+h[0]+'\nSet aside '+fmtM(stake)+' · '+p+'% chance · on success you get '+fmtM(pay)+' back in total.','Erol Bey: "'+j[1]+'"\n'+who[1]+h[1]+'\n'+fmtM(stake)+' ayır · %'+p+' şans · başarıda toplam '+fmtM(pay)+' geri alırsın.');
+  const o=[[LL('Set a trap','Tuzak kur'),()=>{S.money-=stake;S.trap={stake,p,pay,t:60};toast(LL('Trap set. Mr. Erol will report back.','Tuzak kuruldu. Erol Bey haber verecek.'));return null;}]];
+  if(S.emp[7]){const comp=Math.round(Math.max(80,inc*40));t+=LL('\nBegüm: '+fmtM(comp)+' settlement now, but she is in court for 3 min (no lawyer bonus on new offers).','\nBegüm: hemen '+fmtM(comp)+' tazminat, ama 3 dk mahkemede (yeni tekliflerde avukat primi yok).');
+    o.push([LL('Begüm, handle it','Begüm halletsin'),()=>{gain(comp);S.lawT=180;bSig='';return '+'+fmtM(comp);}]);}
+  o.push([LL('Pass','Pas'),null,true]);sfx('bad',30);sayC(t,o);setExpr('xs',0);return true;}
+function resolveTrap(off){const tr=S.trap;S.trap=null;if(!tr)return;const win=Math.random()*100<tr.p;if(win)gain(tr.pay);
+  const m=win?LL('Mr. Erol: "Spy caught! His only complaint in the statement: the tea was weak. I will talk to the tea room." +'+fmtM(tr.pay),'Erol Bey: "Casus yakalandı! İfadesinde tek şikâyeti çayın demsiz olmasıymış. Ocakçıyla görüşeceğim." +'+fmtM(tr.pay))
+    :LL('Mr. Erol: "The spy noticed the trap and slipped away. He took a glass of tea on the way out." −'+fmtM(tr.stake),'Erol Bey: "Casus tuzağı fark edip sıvıştı. Çıkarken bir bardak da çay aldı." −'+fmtM(tr.stake));
+  if(off)retAdd(m);else{say(m,LL('OK','Tamam'),null);sfx(win?'win':'down');}}
+function rizaMaint(o){const r=rate();if(r<=.001)return;const rem=o.need-o.done,pt=rem/r,de=x=>o.kind==='hotel'?Math.max(x,o.wait||0)+testDur():x,e1=de(pt),e2=de(pt*.75),cost=(o.paid||0)*.1;
+  if(e1-e2<3||S.money<cost)return;
+  sayC(LL('Rıza: "There is a faint cavitation sound on the assembly line, boss. A quick service and the line opens up."\nPay '+fmtM(cost)+' · estimated delivery '+mmss(e1)+' → '+mmss(e2),'Rıza: "Montaj hattında hafif kavitasyon sesi var usta. Kısa bir bakım yaparsak bant açılır."\n'+fmtM(cost)+' öde · tahmini teslimat '+mmss(e1)+' → '+mmss(e2)),
+    (bchK='m',0)||[[LL('Service it','Bakım yap'),()=>{if(S.order!==o||S.money<cost)return null;S.money-=cost;o.done+=(o.need-o.done)*.25;sfx('build');return LL('Serviced','Bakım yapıldı');}],[LL('Pass','Pas'),null,true]]);}
+let cof=null,rzT=0;
+function rizaShow(line,ms){const z=$('riza');if(!$('rfig').innerHTML)$('rfig').innerHTML=face(EMPS[0].f,46)+'<svg viewBox="0 0 60 16" width="58" height="16" style="margin-top:-4px"><rect x="2" y="9" width="56" height="4" rx="2" fill="#9aa3a0"/><path d="M12 9 h9 v-6 h-9z M27 9 h9 v-6 h-9z M42 9 h9 v-6 h-9z" fill="#fff" stroke="#7b4a2b" stroke-width="1"/></svg>';
+  $('rbub').textContent=line||'';z.classList.add('on');clearTimeout(rzT);if(ms)rzT=setTimeout(()=>{z.classList.remove('on');$('rbub').textContent='';},ms);}
+function coffeeStart(fromCup){if(cof||!S.emp[0])return false;cof={n:0,t:20};rizaShow(LL('Coffee break, boss! I will help with a few.','Kahve molası usta! Birkaç tanesine ben de el atayım.'));if(!fromCup)sfx('pop');return true;}
+function cofTap(xp,yp){cof.n++;cof.t=Math.max(cof.t,8);produce(tapPow(),true);setTimeout(()=>floatText('+Rıza',Math.min(80,xp+8),yp+6),120);const z=$('riza');z.classList.remove('bob');void z.offsetWidth;z.classList.add('bob');
+  if(cof.n>=3){cof=null;rizaShow(LL('Boss, the coffee is getting cold.','Usta, kahve soğuyor.'),2600);}}
+const TTN={hotel:['hotel','otel'],muni:['water network','su şebekesi'],hosp:['hospital','hastane'],dc:['data center','veri merkezi'],air:['airport','havalimanı']};
+const RUMJ=[['Word on the street: a {t} tender is opening around {c}. It will be on the board soon.','Kulağıma geldi: {c} tarafında bir {t} ihalesi açılacakmış. Yakında panoda olur.'],
+ ['Someone whispered it at golf: there is a {t} job around {c}. I pretended not to hear, of course.','Golfte biri fısıldadı: {c} tarafında bir {t} işi varmış. Ben duymamış gibi yaptım tabii.'],
+ ['They are talking about it in the tea room: a {t} tender is coming from around {c}. Reliable source, the tea guy said so.','Çay ocağında konuşuluyor: {c} tarafından bir {t} ihalesi geliyormuş. Kaynak sağlam, çaycı söyledi.']];
+let prevNT=0;
+function rumorTick(){const nt=S.nextTender,cross=prevNT>=240&&nt<240;prevNT=nt;if(!cross||S.rumor||!S.tenderShown||stageIdx()<1||Math.random()<.5)return;
+  if(S.offers.some(o=>o.kind==='hotel')||(S.order&&S.order.kind==='hotel')||document.hidden||$('bubble').classList.contains('on')||$('modal').classList.contains('on')||S.skyIntro)return;
+  const st=stageIdx(),ks=Object.keys(TT).filter(x=>TT[x].st<=Math.max(1,st)&&x!==S.lastTT),tt=ks[Math.random()*ks.length|0]||'hotel',m=S.map||[],fr=CITY.map((_,i)=>i).filter(i=>!m.includes(i)),pool=fr.length?fr:CITY.map((_,i)=>i),city=pool[Math.random()*pool.length|0];
+  S.rumor={tt,city};mapSig='';const j=RUMJ[Math.random()*RUMJ.length|0],f=(x,l)=>x.split('{t}').join(TTN[tt][l]).split('{c}').join(cityN(city));
+  say(LL('Mr. Erol: "'+f(j[0],0)+'"','Erol Bey: "'+f(j[1],1)+'"'),LL('Noted','Not aldım'),null);save();}
+function evTick(dt){rumorTick();
+  {const o=S.order;if(o&&o.kind==='hotel'&&o.stage==='test'){const n=document.getElementById('tbN');if(n)n.setAttribute('transform','rotate('+(-130+190*Math.min(1,1-o.test/(o.td||1))).toFixed(1)+')');}}
+  if(!document.hidden){if(S.spyT==null)S.spyT=1200+Math.random()*600;if(S.life>20000)S.spyT-=dt;
+    if(S.spyT<=0&&!$('bubble').classList.contains('on')){S.spyT=spyEv()?1200+Math.random()*600:60;}}
+  if(S.trap){S.trap.t-=dt;if(S.trap.t<=0&&!$('bubble').classList.contains('on'))resolveTrap(false);}
+  if(S.lawT>0){S.lawT-=dt;if(S.lawT<=0){S.lawT=0;bSig='';toast(LL('Begüm is back from court.','Begüm mahkemeden döndü.'));}}
+  if(cof){cof.t-=dt;if(cof.t<=0){cof=null;$('riza').classList.remove('on');$('rbub').textContent='';}}
+  if(S.cup){S.cupT=(S.cupT||180)-dt;if(S.cupT<=0){S.cup=0;rizaShow(LL("I drank it so it wouldn't get cold, boss.",'Soğumasın diye ben içtim usta.'),3000);}
+    else if(!S.cupSeen&&!$('bubble').classList.contains('on')&&!$('modal').classList.contains('on')){S.cupSeen=1;say(LL("Mr. Erol: \"Rıza left you a coffee. He didn't leave me one. I'm making a note.\"",'Erol Bey: "Rıza sana kahve bırakmış. Bana bırakmamış. Not ediyorum."'),LL('OK','Tamam'),null);}}
+  if(!S.selinU&&S.emp[1]&&(S.sky||[]).includes('hotel')&&!S.skyIntro&&performance.now()>selinWait&&!document.hidden&&!$('bubble').classList.contains('on')&&!$('modal').classList.contains('on')&&!cof){S.selinU=1;S.selinT=300;selinShow(LL('We delivered the set. If the pressure drops a little at night, do you know who wakes up first?','Seti teslim ettik. Gece basınç biraz düşerse ilk kimin uyanacağını biliyor musun?'),12000);save();}
+  if(S.selinT>0&&!document.hidden){S.selinT-=dt;if(S.selinT<=0)$('selin').classList.remove('on');}
+  $('cup').classList.toggle('on',!!S.cup&&!cof);}
+$('cup').addEventListener('click',e=>{e.stopPropagation();if(!S.cup)return;S.cup=0;coffeeStart(true);save();});
+
 /* ---------- tapping ---------- */
-function tapAt(xp,yp){S.taps++;sfx('tap',8);const bp=$('bigp');if(bp){bp.classList.remove('pulse');void bp.getBBox();bp.classList.add('pulse');}const p=tapPow(),ob=ordBusy();produce(p,true);floatText(ob?'+'+fmt(p)+' work':'+'+fmtM(p*price()),xp,yp);updateUI();}
-$('scene').addEventListener('click',e=>{if(panned)return;const bd=e.target.closest&&e.target.closest('[data-dept]');if(bd&&bd.querySelector('.hitb')){openDept(+bd.dataset.dept);return;}const r=$('scene').getBoundingClientRect();tapAt((e.clientX-r.left)/r.width*100-6,(e.clientY-r.top)/r.height*100-10);});
+function tapAt(xp,yp){if(cof)cofTap(xp,yp);S.taps++;sfx('tap',8);const bp=$('bigp');if(bp){bp.classList.remove('pulse');void bp.getBBox();bp.classList.add('pulse');}const p=tapPow(),ob=ordBusy();produce(p,true);floatText(ob?'+'+fmt(p)+' work':'+'+fmtM(p*price()),xp,yp);updateUI();}
+$('scene').addEventListener('click',e=>{if(panned)return;const bd=e.target.closest&&e.target.closest('[data-dept]');if(bd&&bd.querySelector('.hitb')){if(+bd.dataset.dept===3&&S.selinU&&S.emp[1]&&!$('bubble').classList.contains('on')){selinMenu();return;}openDept(+bd.dataset.dept);return;}const r=$('scene').getBoundingClientRect();tapAt((e.clientX-r.left)/r.width*100-6,(e.clientY-r.top)/r.height*100-10);});
 $('tap').addEventListener('click',()=>tapAt(30+Math.random()*30,45));
 /* ---------- bottom nav + next job ---------- */
 let sec='o';
@@ -756,19 +858,19 @@ function navUI(){const dot={o:(S.offers.length&&!S.order)||testReady()||$('fair'
   document.querySelectorAll('.bnav button').forEach(b=>{const k=b.dataset.sec;b.classList.toggle('dot',!!dot[k]&&sec!==k);if(k==='e')b.style.display=has('staff')?'':'none';if(k==='i')b.style.display=has('ipo')?'':'none';});}
 let mapSig='';
 function mapUI(){const box=$('mapBox');if(!S.tenderShown){box.style.display='none';return;}box.style.display='';const m=S.map||[],o=S.order,act=new Set([...(o&&o.city!=null?[o.city]:[]),...S.offers.filter(f=>f.city!=null).map(f=>f.city)]);
-  const sig=[m.join(','),[...act].join(','),S.mapTot||0,S.cn||0].join('|');if(sig===mapSig)return;mapSig=sig;const tot=m.length+(S.mapTot||0),land=PAL[(S.cn||0)%3].land;
+  const rc=S.rumor?S.rumor.city:-1;const sig=[m.join(','),[...act].join(','),S.mapTot||0,S.cn||0,rc].join('|');if(sig===mapSig)return;mapSig=sig;const tot=m.length+(S.mapTot||0),land=PAL[(S.cn||0)%3].land;
   $('mapT').textContent=LL('Tender map · ','İhale haritası · ')+ctryN(S.cn||0);$('mapSum').textContent=m.length+' / 8 · +'+(LANG==='tr'?'%'+5*tot:5*tot+'%');
   $('mapNote').textContent=m.length>=8?LL('Every region won! A new country is waiting.','Tüm bölgeler kazanıldı! Yeni bir ülke seni bekliyor.'):LL('Win a tender in each region: +5% production forever.','Her bölgede bir ihale kazan: kalıcı +%5 üretim.');
   $('mapSvg').innerHTML=`<rect width="340" height="200" fill="#bfe3f2"/><path d="M14 104 C18 60 60 30 110 30 C150 22 190 34 230 30 C280 26 322 50 318 92 C316 130 290 150 262 160 C230 176 180 172 150 178 C110 186 60 186 40 166 C20 150 12 130 14 104Z" fill="${land}" stroke="#fff" stroke-width="3"/><ellipse cx="286" cy="178" rx="24" ry="12" fill="${land}" stroke="#fff" stroke-width="3"/>
    <path d="M60 112 Q100 90 130 52 M130 52 Q170 70 200 86 M200 86 Q230 70 258 56 M200 86 Q170 110 146 124 M146 124 Q190 136 236 140 M146 124 Q110 150 92 160" stroke="#fff" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity=".8"/>`+
-   CITY.map((c,i)=>{const w=m.includes(i),a=act.has(i);return `<g transform="translate(${c[2]} ${c[3]})">${w?`<circle r="8" fill="#2f9e5b" stroke="#fff" stroke-width="2"/><path d="M-3 0 l2 3 l5 -6" stroke="#fff" stroke-width="2" fill="none"/>`:a?`<circle class="pl" r="7" fill="#e0342b" stroke="#fff" stroke-width="2"/>`:`<circle r="5" fill="#fff" stroke="#8a7a6a" stroke-width="2"/>`}<text y="${i===7?20:18}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="10" fill="#3a2a20" stroke="#ffffffcc" stroke-width="3" paint-order="stroke">${cityN(i)}</text></g>`;}).join('');}
+   CITY.map((c,i)=>{const w=m.includes(i),a=act.has(i);return `<g transform="translate(${c[2]} ${c[3]})">${i===rc&&!w&&!a?`<circle r="7" fill="#ffd23d" stroke="#fff" stroke-width="2"/><text y="3.5" text-anchor="middle" font-size="10" font-weight="800" fill="#3a2a20">?</text>`:w?`<circle r="8" fill="#2f9e5b" stroke="#fff" stroke-width="2"/><path d="M-3 0 l2 3 l5 -6" stroke="#fff" stroke-width="2" fill="none"/>`:a?`<circle class="pl" r="7" fill="#e0342b" stroke="#fff" stroke-width="2"/>`:`<circle r="5" fill="#fff" stroke="#8a7a6a" stroke-width="2"/>`}<text y="${i===7?20:18}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="10" fill="#3a2a20" stroke="#ffffffcc" stroke-width="3" paint-order="stroke">${cityN(i)}</text></g>`;}).join('');}
 let abArm=false;const abEl=()=>stageIdx()>=4&&(S.map||[]).length>=4,abOK=()=>abEl()&&!S.order;
 function abroadUI(){const ok=abEl();$('abroad').style.display=ok?'':'none';if(!ok)return;$('abB').disabled=!!S.order;const nx=ctryN((S.cn||0)+1);
   $('abT').textContent=LL('New country: ','Yeni ülke: ')+nx;
   $('abP').textContent=LL('Open a factory abroad. Departments, products and cash start over. Badges, staff, costumes, decorations, stocks and won regions come with you. Production ×3 forever.','Yurt dışında fabrika aç. Bölümler, ürünler ve para sıfırdan başlar. Rozetler, ekip, kostümler, süsler, hisseler ve kazanılan bölgeler seninle gelir. Üretim kalıcı ×3.');
   $('abB').textContent=S.order?LL('Finish the current order first','Önce mevcut siparişi bitir'):abArm?LL('Sure? Tap again to move','Emin misin? Taşınmak için tekrar dokun'):LL('Open a factory in ','Şu ülkede fabrika aç: ')+nx;}
 $('abB').addEventListener('click',()=>{if(!abOK())return;if(!abArm){abArm=true;abroadUI();sfx('pop');setTimeout(()=>{abArm=false;abroadUI();},5000);return;}abArm=false;
-  const K=['ach','out','deco','inv','story','un','snd','mus','amb','dy','guideDone','emp','hold','basis','px','hist','own','ipo','sent','trades','refs','q','mu','fairs','oseen','earned','taps','nt','done','tdone','mc','ref2','surv','lastTT'];
+  const K=['ach','out','deco','inv','story','un','snd','mus','amb','dy','guideDone','emp','hold','basis','px','hist','own','ipo','sent','trades','refs','q','mu','fairs','oseen','earned','taps','nt','done','tdone','mc','ref2','surv','lastTT','skyShown','selinU'];
   const n=fresh();K.forEach(k=>{if(S[k]!==undefined)n[k]=S[k];});n.cn=(S.cn||0)+1;n.mapTot=(S.mapTot||0)+(S.map||[]).length;n.map=[];n.tenderShown=1;n.nextTender=120;n.money=1000;n.mor=S.mor||80;
   S=n;fillBoard();bSig='';mapSig='';applyUnl();renderTasks();morUI();drawnStage=-1;lastStage=0;lastOpen='';drawScene();renderList();updateUI();save();sfx('fanfare');abroadUI();
   modal(LL('Welcome to '+ctryN(S.cn)+'!',ctryN(S.cn)+"'a hoş geldin!"),LL('Production ×'+3**S.cn+' forever. Your badges, team and stocks came along.','Üretim kalıcı ×'+3**S.cn+'. Rozetlerin, ekibin ve hisselerin de seninle geldi.')+' '+LL('Mr. Erol: "New country, same genius. Metin, does the Wi-Fi work here?"','Erol Bey: "Yeni ülke, aynı deha. Metin, burada Wi-Fi çekiyor mu?"'),'Hooray');});
@@ -818,7 +920,7 @@ function updateButtons(){document.querySelectorAll('[data-buy]').forEach(b=>{b.d
   document.querySelectorAll('[data-deco]').forEach(b=>{b.disabled=S.money<DECO[+b.dataset.deco].c;});
   document.querySelectorAll('[data-prod]').forEach(b=>{b.disabled=!!b.dataset.lock||S.money<PRODUCTS[+b.dataset.prod].c;});}
 $('list').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
-  if(b.dataset.buy!==undefined){const i=+b.dataset.buy,c=cost(i,mult);if(S.money>=c){S.money-=c;const was=S.lv[i];S.lv[i]+=mult;S.lb+=mult;if(S.done>=1)S.ug=1;drawScene();if(was===0)sfx('build',20);
+  if(b.dataset.buy!==undefined){const i=+b.dataset.buy,c=cost(i,mult);if(S.money>=c){S.money-=c;const was=S.lv[i];S.lv[i]+=mult;S.lb+=mult;if(S.done>=1)S.ug=1;drawScene();bldFlash(i);if(was===0)sfx('build',20);
     if(was===0&&i===0)say('Our first department is open! Now we build pumps even while I nap.','Great',null);
     else if(nextMile(was)!==nextMile(S.lv[i]))say(DEPTS[i].n+' sped up! Production doubled. All part of my plan, of course.','Of course',null);}}
   if(b.dataset.hire!==undefined){const i=+b.dataset.hire;if(S.money>=EMPS[i].c){S.money-=EMPS[i].c;S.emp[i]=true;say(EMPS[i].n.split(' ').pop()+' joined the team! Welcome party? No? Okay.','Welcome',null);}}
@@ -840,7 +942,7 @@ function orderUI(){updBoard();guideUI();}
 /* ---------- modal ---------- */
 const mq=[];function showM(){const m=mq[0];if(!m)return;$('mT').textContent=m[0];if(m[3])$('mP').innerHTML=m[3];else $('mP').textContent=m[1];$('mB').textContent=m[2]||'Great';$('modal').classList.add('on');}
 function modal(t,p,b,html){mq.push([t,p,b,html]);if(mq.length===1)showM();}
-$('mB').addEventListener('click',()=>{mq.shift();$('modal').classList.remove('on');if(mq.length)setTimeout(showM,150);});
+$('mB').addEventListener('click',()=>{mq.shift();$('modal').classList.remove('on');if(mq.length)setTimeout(showM,150);else if(S.skyIntro)setTimeout(skyIntro,450);});
 const MOR=[{n:'Tea break',v:10,cd:60,c:()=>0},{n:'Team lunch',v:30,cd:180,c:()=>Math.max(500,income()*30)},{n:'Company picnic',v:100,cd:600,c:()=>Math.max(5000,income()*180)}];
 const MSAY=['Tea for everyone! I made it myself. Well, the machine did.','Lunch is on the company! I ordered extra köfte for me.','Picnic time! I brought my famous potato salad. Nobody asked, but here it is.'];
 function morUI(){const m=Math.floor(S.mor);$('morLab').textContent=m+'% · '+(S.mor>=80?'×1.25':'×1');const b=$('morBar');b.style.width=m+'%';b.style.background=S.mor>=80?'#2f9e5b':S.mor>=50?'var(--yel)':S.mor>=25?'#f08a24':'#e0342b';
@@ -930,9 +1032,10 @@ const secs=x=>Math.max(0,Math.ceil(x))+' s';
 const onm=c=>/order|restock/i.test(c)?c:c+' order';
 let rcpt=null;
 const DELQ=["Another delivery! Someone ring a bell. Not the stock exchange one, Begüm said no.","The truck is gone and so is my worry.","Customers love us. Mostly because of me.","Delivered on time. I'd like to thank myself."];
-function shipFx(k){sfx(k||'ship');const g=document.getElementById('ship');if(g){g.classList.remove('go');void g.getBBox();g.classList.add('go');}}
+function cargoSvg(p){return p===2||p===3?'<rect x="3" y="188" width="34" height="4" fill="#3d4a44"/><rect x="5" y="179" width="13" height="9" rx="2" fill="#d7263d"/><circle cx="25" cy="182" r="6" fill="#d7263d" stroke="#8e1626" stroke-width="1.4"/><rect x="23" y="172" width="4" height="5" fill="#d7263d"/>':p===4||p===5?'<rect x="3" y="183" width="34" height="9" rx="4.5" fill="#2f9e5b" stroke="#1f6e40" stroke-width="1.4"/><rect x="27" y="183" width="3" height="9" fill="#1f6e40"/>':'';}
+function shipFx(k,p){sfx(k||'ship');const g=document.getElementById('ship');if(g){const cg=g.querySelector('.cargo');if(cg)cg.innerHTML=cargoSvg(p);g.classList.remove('go');void g.getBBox();g.classList.add('go');}}
 const latePen=o=>o.t<0?Math.min(.5,Math.floor(-o.t/10)*.05):0;
-function calcOffer(o){o.uw=uWork(o.p,o.sc);o.need=o.q*o.uw;o.rev=o.need*price()*KM[o.p]*effMul('order')*(o.ref?1.2:1)*Math.pow(.9,o.ext);o.cost=o.free?0:o.rev*.3;o.d=Math.round(o.d0*(1+.5*o.ext));return o;}
+function calcOffer(o){o.uw=uWork(o.p,o.sc);o.need=o.q*o.uw;o.rev=o.need*price()*KM[o.p]*ordMul()*(o.ref?1.2:1)*Math.pow(.9,o.ext);o.cost=o.free?0:o.rev*.3;o.d=Math.round(o.d0*(1+.5*o.ext));return o;}
 function mkOffer(op){op=op||{};const av=S.prod.map((v,i)=>v?i:-1).filter(i=>i>=0);
   const dealer=op.dealer??(op.p==null&&Math.random()<.4);
   const p=op.p??(dealer?(S.prod[4]&&Math.random()<.4?4:0):(Math.random()<.8?av[Math.random()*av.length|0]:Math.min(6,av[av.length-1]+1)));
@@ -948,7 +1051,7 @@ const TT={hotel:{st:1,nk:1,rk:2.4,dk:1,p:2,q:1500,b:8,ic:'🏨',names:['Seaside 
  dc:{st:2,nk:1.2,rk:2.6,dk:.8,p:1,q:2400,b:6,ic:'🖥️',names:['Data center','Cloud campus']},
  air:{st:3,nk:3,rk:2.9,dk:1.2,p:3,q:5000,b:10,ic:'✈️',names:['Airport terminal','Cargo airport']}};
 const ttOf=o=>TT[(o&&o.tt)||'hotel'];const isH=o=>!o.tt||o.tt==='hotel';
-const tNeed=o=>o.need*(o.red?1.25:1),tRev=o=>o.rev*(o.red?1.4:1);
+const tNeed=o=>o.need*(o.red?1.25:1),tRev=o=>o.rev*(o.red?1.4:1)*(o.v2?ordMul():1);
 function TTX(k){return ({
  hosp:{main:LL('UL/FM fire pump + booster','UL/FM yangın pompası + hidrofor'),ext:LL('Diesel fire pump','Dizel yangın pompası'),extW:LL('diesel engine','dizel motor'),
   comps:[['⚙',LL('Electric fire pump (UL Listed)','Elektrikli yangın pompası (UL listeli)'),LL('our production','bizim üretim')],['⛽',LL('Diesel fire pump (FM Approved)','Dizel yangın pompası (FM onaylı)'),LL('external supply','dış tedarik')],['💧',LL('Booster set for clean water','Temiz su hidrofor seti'),LL('our production','bizim üretim')]],
@@ -971,10 +1074,10 @@ const cityN=i=>LL(CITY[i][0],CITY[i][1]);
 const CTRY=[['Homeland','Anavatan'],['Sandoria','Kumistan'],['Frostavia','Buzdiyar']];
 const ctryN=n=>{const c=CTRY[n%3];return LL(c[0],c[1])+(n>=3?' '+(Math.floor(n/3)+1):'');};
 const PAL=[{ground:'#e8b15a',ground2:'#d99a45',roof:'#7b2e22',hall:'#c9503a',win:'#ffe7a3',land:'#cfe6b0'},{ground:'#f2d38c',ground2:'#e3b866',roof:'#8a4a24',hall:'#d0703e',win:'#ffe7a3',land:'#f1d79b'},{ground:'#eef3f7',ground2:'#cdd9e4',roof:'#3f5573',hall:'#b7483a',win:'#fff1b8',land:'#eef3f8'}];
-function mkTender(first,ref){const st=stageIdx();let k='hotel';if(!first&&!ref){const ks=Object.keys(TT).filter(x=>TT[x].st<=Math.max(1,st)&&x!==S.lastTT);k=ks[Math.random()*ks.length|0]||'hotel';}
+function mkTender(first,ref,force){const st=stageIdx();let k='hotel';if(force&&TT[force.tt])k=force.tt;else if(!first&&!ref){const ks=Object.keys(TT).filter(x=>TT[x].st<=Math.max(1,st)&&x!==S.lastTT);k=ks[Math.random()*ks.length|0]||'hotel';}
   const t=TT[k],sc=pScale(),need=150000*sc/1000*t.nk;S.lastTT=k;const m=S.map||[],fr=CITY.map((_,i)=>i).filter(i=>!m.includes(i)),pool=fr.length?fr:CITY.map((_,i)=>i);
-  return {id:Date.now()+Math.random(),kind:'hotel',tt:k,city:pool[Math.random()*pool.length|0],c:ref?'Grand hotel chain, 2nd hotel':first?'Grand hotel chain':t.names[Math.random()*t.names.length|0],need,sc,T:need/Math.max(rate(),.1),ref:!!ref,red:false,
-    rev:need*price()*t.rk*effMul('order')*(1+.1*Math.min(5,S.refs||0))*(ref?1.2:1)};}
+  return {id:Date.now()+Math.random(),kind:'hotel',tt:k,rum:force?1:0,city:force&&force.city!=null?force.city:pool[Math.random()*pool.length|0],c:ref?'Grand hotel chain, 2nd hotel':first?'Grand hotel chain':t.names[Math.random()*t.names.length|0],need,sc,T:need/Math.max(rate(),.1),ref:!!ref,red:false,
+    v2:1,rev:need*price()*t.rk*(1+.1*Math.min(5,S.refs||0))*(ref?1.2:1)};}
 function tPlan(o,k){const A=k==='A',dk=ttOf(o).dk,N=tNeed(o),Rv=tRev(o),T=N/Math.max(rate(),.1),cost=Rv*(A?.35:.2),wait=A?0:Math.round(Math.max(40,T*1.5)),d0=A?T*1.3+testDur()+20:wait+T*.5+testDur()+20,est=Math.max(T,wait)+testDur(),d=Math.round(Math.max(d0*dk,est+15));return {cost,d,wait,est,net:Rv-cost};}
 function fillBoard(){if(!S.offers)S.offers=[];
   if(!S.offers.length&&!S.order&&(S.life||0)<2000&&!S.acc){S.offers=[mkOffer({p:0,dealer:true,q:20,free:true,c:'Local farm irrigation'}),mkOffer({p:0,dealer:true})];S.offers[0].q=S.offers[0].q0=6;S.offers[0].d0=240;calcOffer(S.offers[0]);return;}
@@ -982,16 +1085,19 @@ function fillBoard(){if(!S.offers)S.offers=[];
   const ok=S.offers.filter(o=>o.kind==='std'&&S.prod[o.p]);if(!ok.length&&S.offers.length){const i=S.offers.findIndex(o=>o.kind==='std');if(i>=0)S.offers[i]=mkOffer({p:0,dealer:true});}}
 function orderTick(dt){
   if(stageIdx()>=1&&!S.tenderShown){S.tenderShown=1;S.offers.unshift(mkTender(true));toast('New tender: Grand hotel chain');sfx('badge');}
-  else if(S.tenderShown&&S.nextTender>0&&stageIdx()>=1){S.nextTender-=dt;if(S.nextTender<=0&&!S.offers.some(o=>o.kind==='hotel')&&!(S.order&&S.order.kind==='hotel')){const t=mkTender(false);S.offers.unshift(t);toast('New tender: '+t.c);}}
+  else if(S.tenderShown&&S.nextTender>0&&stageIdx()>=1){S.nextTender-=dt;if(S.nextTender<=0&&!S.offers.some(o=>o.kind==='hotel')&&!(S.order&&S.order.kind==='hotel')){const rm=S.rumor;const t=mkTender(false,false,rm);S.rumor=null;S.offers.unshift(t);if(rm)toast(LL('The tender Mr. Erol heard about is here: ','Erol Bey\'in duyduğu ihale geldi: ')+cityN(t.city));else toast('New tender: '+t.c);mapSig='';}}
   S.boardT-=dt;if(S.boardT<=0){S.boardT=20;fillBoard();}
   const o=S.order;if(!o)return;const t0=o.t;if(!(o.kind==='hotel'&&o.stage!=='test'&&o.done>=o.need&&o.wait<=0))o.t-=dt;if(t0>=0&&o.t<0)sfx('late',30);
+  if(!o.mtried&&S.emp[0]&&!o.free&&(o.paid||0)>0&&!$('bubble').classList.contains('on')&&o.stage!=='test'){const pr=o.done/o.need;if(pr>.15&&pr<.6){o.mtried=1;if(Math.random()<.6)rizaMaint(o);}}
   if(o.kind==='hotel'){if(o.wait>0)o.wait-=dt;if(o.stage==='test'){o.test-=dt;if(o.test<=0)hotelDone();}return;}
   if(o.done>=o.need){const pen=latePen(o),pay=o.rev*(1-pen);gain(pay);if(pen===0)S.done++;
     rcpt={id:Date.now(),c:o.c,coll:pay,mat:o.paid||0,pen:o.rev*pen,q:DELQ[Math.random()*DELQ.length|0]};setTimeout(()=>{rcpt=null;bSig='';updBoard();},12000);
-    S.order=null;drawScene();shipFx('deliver');S.boardT=Math.min(S.boardT,4);renderList();save();}}
-function hotelDone(){const o=S.order,pen=latePen(o),pay=o.rev*(1-pen);gain(pay);if(!pen)S.done++;S.refs=(S.refs||0)+1;S.order=null;S.nextTender=360+Math.random()*180;drawScene();shipFx('fanfare');
+    S.order=null;if(bchK==='m')closeB();drawScene();shipFx('deliver',o.p);setExpr('xh',4000);S.boardT=Math.min(S.boardT,4);renderList();save();}}
+function hotelDone(){const o=S.order,pen=latePen(o),pay=o.rev*(1-pen);gain(pay);if(!pen)S.done++;S.refs=(S.refs||0)+1;S.order=null;if(bchK==='m')closeB();S.nextTender=360+Math.random()*180;tPass=true;drawnStage=-1;drawScene();shipFx('fanfare',ttOf(o).p);setExpr('xh',5000);setTimeout(()=>{tPass=false;drawnStage=-1;drawScene();},4500);
+  if(!S.tst1&&S.emp[1]){S.tst1=1;setTimeout(()=>{selinShow(LL('Pressure settled. All good.','Basınç oturdu. Tamamdır.'),2600);setTimeout(()=>{if(!(S.selinT>0))$('selin').classList.remove('on');},2800);},500);}
   if(!S.ref2&&isH(o)){S.ref2=1;S.offers.unshift(mkTender(false,true));}
   if(!S.map)S.map=[];const nr=o.city!=null&&!S.map.includes(o.city);if(nr)S.map.push(o.city);
+  {const k=o.tt||'hotel';if(!S.sky)S.sky=[];if(!S.sky.includes(k)){S.sky.push(k);if(k==='hotel'&&!S.skyShown)S.skyIntro='hotel';}S.tl=1;drawnStage=-1;drawScene();}
   const t=ttOf(o),loc=LANG==='tr'?'tr-TR':'en-US',mf=Math.round(t.q*(.995+Math.random()*.025)),mb=(t.b+Math.random()*.2).toFixed(1);let L;
   if(isH(o))L=['Target: 1,500 L/min @ 8 bar','Measured: '+mf.toLocaleString(loc)+' L/min @ '+mb+' bar','Result: Passed ✓'];
   else{L=[LL('Target: '+t.q.toLocaleString(loc)+' L/min @ '+t.b+' bar','Hedef: '+t.q.toLocaleString(loc)+' L/dk @ '+t.b+' bar'),'Measured: '+mf.toLocaleString(loc)+' L/min @ '+mb+' bar'];
@@ -1001,7 +1107,7 @@ function hotelDone(){const o=S.order,pen=latePen(o),pay=o.rev*(1-pen);gain(pay);
   if(pen)L.push('Late penalty: '+fmtM(-o.rev*pen));L.push('Net profit: '+fmtM(pay-(o.paid||0)));
   if(nr)L.push(LL('Region won: '+cityN(o.city)+' · +5% production forever','Bölge kazanıldı: '+cityN(o.city)+' · kalıcı +%5 üretim'));
   L.push('Reference card earned: '+o.c);L.push(isH(o)?'Mr. Erol: "Our first big delivery! Cake for everyone. Begüm, is cake legal?"':TTX(o.tt).q);
-  modal(nr?LL('Delivered! Region won','Teslim edildi! Bölge kazanıldı'):'Delivered! Reference card earned','','Hooray','<div class="rl">'+L.map(x=>'<div>'+x+'</div>').join('')+'</div>');mapSig='';mapUI();renderList();save();}
+  {const mt=nr?LL('Delivered! Region won','Teslim edildi! Bölge kazanıldı'):'Delivered! Reference card earned',mh='<div class="rl">'+L.map(x=>'<div>'+x+'</div>').join('')+'</div>';setTimeout(()=>modal(mt,'','Hooray',mh),1500);}mapSig='';mapUI();renderList();save();}
 let bSig='',detOpen=false;const oOpen={};
 const kv=(l,v,c)=>`<div><small>${l}</small><b${c?` class="${c}"`:''}>${v}</b></div>`;
 function comps(){return `<div class="steps"><span>⚙</span><span>Electric main pump: <b>our production</b></span><span>⛽</span><span>Diesel backup pump: <b>external supply</b></span><span>◎</span><span>Jockey pump: <b>from stock</b></span></div>`;}
@@ -1015,6 +1121,7 @@ function renderBoard(){const o=S.order,h=[];
     else h.push(`<div class="off"><h4><span>${o.c}</span><small id="aT"></small></h4><span>${fmt(o.q)} × ${PRODUCTS[o.p].n} · ${fmt(o.uw)} work/unit</span><div class="prog"><i id="aBar"></i></div>
       <div class="kv">${kv('Assembled','<span id="aP"></span>')}${kv('Finish (no taps)','<span id="aE"></span>')}${kv('Taps saved','<span id="aS"></span>')}${kv('Paid materials',fmtM(paid))}${kv('To collect','<span id="aC"></span>','pos')}${kv('Work rate','<span id="aW"></span>')}</div>
       <p class="note" style="text-align:left">Standard pump sales pause while an order runs. Upgrades shorten the remaining time.</p></div>`);}
+  const lawN=lawOn()?'<p class="note law">'+LL('Begüm back in <span class="lawc"></span> · this offer stays on the board','Begüm <span class="lawc"></span> sonra döner · Bu teklif panoda kalacak')+'</p>':'';
   S.offers.forEach(f=>{
     if(f.kind==='hotel'){const X=isH(f)?null:TTX(f.tt);const pl=['A','B'].map(k=>{const t=tPlan(f,k);return `<div class="strat"><b>${X?(k==='A'?LL('Buy from stock, short deadline','Stoktan al, kısa termin'):LL('Wait for '+X.extW,cap(X.extW)+' beklenir')):k==='A'?'Ready set, short deadline':'Wait for diesel supply'}</b><p>${X?(k==='A'?LL('Buy stocked '+X.extW+'. Fast, lower profit.','Stoktaki '+X.extW+' alınır. Hızlı, kâr düşük.'):LL(cap(X.extW)+' arrive in '+secs(t.wait)+'. Slower, higher profit.',cap(X.extW)+' '+Math.round(t.wait)+' sn içinde gelir. Yavaş, kâr yüksek.')):k==='A'?'Buy a stocked diesel unit. Fast, lower profit.':'Diesel engine arrives in '+secs(t.wait)+'. Slower, higher profit.'}</p>
         <div class="kv">${kv('Net profit',fmtM(t.net),'pos')}${kv('Deadline',secs(t.d))}${kv('Finish (no taps)',secs(t.est),t.est<=t.d?'pos':'neg')}</div>
@@ -1022,18 +1129,18 @@ function renderBoard(){const o=S.order,h=[];
       const cps=X?`<div class="steps">${X.comps.map(c=>`<span>${c[0]}</span><span>${c[1]}: <b>${c[2]}</b></span>`).join('')}</div>`:comps();
       const dts=X?X.det.map(x=>'<li>'+x+'</li>').join(''):'<li>Main pump: electric, 1,500 L/min at 8 bar</li><li>Backup pump: diesel, same duty, starts on power loss</li><li>Jockey pump: keeps the system at 8.5 bar</li><li>Delivery test: flow and pressure on the test bench</li>';
       const red=f.tt==='dc'?`<div class="orow"><button class="ghost${f.red?' on':''}" data-red="${f.id}">${f.red?'✓ ':''}${LL('Redundancy N+1','Yedeklilik N+1')}</button></div><p class="note" style="text-align:left">${LL('+1 standby pump: +25% work, +40% revenue','+1 yedek pompa: +%25 iş, +%40 gelir')}</p>`:'';
-      h.push(`<div class="off tnd"><h4><span><span>${ttOf(f).ic} </span><span>${f.c}</span><span class="tag r">Tender</span>${f.ref?'<span class="tag">Referral</span>':''}${f.city!=null?'<span class="tag">📍 '+cityN(f.city)+'</span>':''}</span></h4><span>1 set · ${fmt(tNeed(f))} work</span>${cps}
-        <div class="kv">${kv('Revenue',fmtM(tRev(f)),'pos')}${kv('Materials','<span class="sm">A '+fmtM(tPlan(f,'A').cost)+' · B '+fmtM(tPlan(f,'B').cost)+'</span>')}</div><details id="tdet"${detOpen?' open':''}><summary>Technical details</summary><ul>${dts}</ul></details>${red}${pl}</div>`);return;}
+      h.push(`<div class="off tnd"><h4><span><span>${ttOf(f).ic} </span><span>${f.c}</span><span class="tag r">Tender</span>${f.ref?'<span class="tag">Referral</span>':''}${f.rum?'<span class="tag">'+LL('👂 Erol heard it','👂 Erol duymuştu')+'</span>':''}${f.city!=null?'<span class="tag">📍 '+cityN(f.city)+'</span>':''}</span></h4><span>1 set · ${fmt(tNeed(f))} work</span>${cps}
+        <div class="kv">${kv('Revenue',fmtM(tRev(f)),'pos')}${kv('Materials','<span class="sm">A '+fmtM(tPlan(f,'A').cost)+' · B '+fmtM(tPlan(f,'B').cost)+'</span>')}</div><details id="tdet"${detOpen?' open':''}><summary>Technical details</summary><ul>${dts}</ul></details>${red}${lawN}${pl}</div>`);return;}
     const can=S.prod[f.p];calcOffer(f);const est=f.need/Math.max(rate(),.001),minQ=Math.max(20,Math.ceil(f.q0*.25/10)*10);
     h.push(`<div class="off${can?'':' lock'}${f.free?' first':''}">${f.free?'<span class="tag fj">First job · materials free</span>':''}<h4><span>${f.c}${f.ref?'<span class="tag">Referral</span>':''}${f.dealer?'<span class="tag">Dealer</span>':''}</span><small>${secs(f.d)}</small></h4><span>${fmt(f.q)} × ${PRODUCTS[f.p].n} · ${fmt(f.uw)} work/unit</span>
-      <div class="kv">${kv('Net profit',fmtM(f.rev-f.cost),'pos')}${kv('Deadline',secs(f.d))}${kv('Finish (no taps)',rate()>.001?'~'+secs(est):'Tap to build',est<=f.d?'pos':'neg')}</div>
+      ${lawN}<div class="kv">${kv('Net profit',fmtM(f.rev-f.cost),'pos')}${kv('Deadline',secs(f.d))}${kv('Finish (no taps)',rate()>.001?'~'+secs(est):'Tap to build',est<=f.d?'pos':'neg')}</div>
       <details class="odet" data-id="${f.id}"${oOpen[f.id]?' open':''}><summary>Details</summary><div class="kv">${kv('Revenue',fmtM(f.rev))}${kv('Materials',f.free?'Paid by customer':fmtM(f.cost))}${kv('Status',est<=f.d?'On time':'Needs taps',est<=f.d?'pos':'neg')}</div>${f.dealer?'':'<p class="note" style="text-align:left">Quantity is fixed by the project specification.</p>'}</details>
       ${can?`<div class="orow">${f.dealer?`<button class="ghost" data-osm="${f.id}" ${f.q<=minQ?'disabled':''}>Smaller</button>`:''}<button class="ghost" data-oext="${f.id}" ${f.ext>=2?'disabled':''}>More time</button><button class="ghost" data-odec="${f.id}">Decline</button></div>
       <button data-oacc="${f.id}" ${o||S.money<f.cost?'disabled':''}>${o?'Finish your current order first':S.money<f.cost?'Need '+fmtM(f.cost)+' for materials':'Accept'}</button>`:`<p class="note" style="text-align:left">Requires: ${PRODUCTS[f.p].n}</p><div class="orow"><button class="ghost" data-odec="${f.id}">Decline</button></div>`}</div>`);});
   if(!o&&!S.offers.length)h.push('<p class="note">New offers are on the way.</p>');
   $('active').innerHTML='';$('offers').innerHTML=h.join('');$('refs').textContent=S.refs?'Reference cards: '+S.refs:'';updBoard();}
-function boardSig(){const o=S.order;return JSON.stringify([rcpt&&rcpt.id,o&&o.kind,o&&o.stage,o&&(o.kind==='hotel'?(o.done>=o.need&&o.wait<=0):0),o&&o.t<0,S.offers.map(f=>[f.id,f.q,f.ext,f.red,S.money>=(f.kind==='hotel'?tPlan(f,'B').cost:f.cost),S.money>=(f.kind==='hotel'?tPlan(f,'A').cost:0),S.prod[f.p]]),S.refs,S.emp[1],LANG,Math.round(Math.log10(capRate())*4)]);}
-function updBoard(){const sg=boardSig();if(sg!==bSig){bSig=sg;renderBoard();return;}const o=S.order;if(!o)return;
+function boardSig(){const o=S.order;return JSON.stringify([rcpt&&rcpt.id,o&&o.kind,o&&o.stage,o&&(o.kind==='hotel'?(o.done>=o.need&&o.wait<=0):0),o&&o.t<0,lawOn(),S.offers.map(f=>[f.id,f.q,f.ext,f.red,S.money>=(f.kind==='hotel'?tPlan(f,'B').cost:f.cost),S.money>=(f.kind==='hotel'?tPlan(f,'A').cost:0),S.prod[f.p]]),S.refs,S.emp[1],LANG,Math.round(Math.log10(capRate())*4)]);}
+function updBoard(){const sg=boardSig();if(sg!==bSig){bSig=sg;renderBoard();}document.querySelectorAll('.lawc').forEach(e=>e.textContent=mmss(S.lawT||0));if(sg!==bSig||!S.order)return;const o=S.order;if(!o)return;
   const T=$('aT');if(T)T.textContent=o.t>=0?secs(o.t):'Late '+secs(-o.t)+' · −'+Math.round(latePen(o)*100)+'%';const pr=Math.min(1,o.done/o.need),C=$('aC');if(C)C.textContent=fmtM(o.rev*(1-latePen(o)));
   if(o.kind==='hotel'){const ok=v=>v?'✓':'•';$('sP').textContent=ok(pr>=1);$('aP').textContent=Math.floor(pr*100)+'%';$('sD').textContent=ok(o.wait<=0);$('aD').textContent=o.strat==='A'?'In stock':o.wait>0?'Arrives in '+secs(o.wait):'Arrived';
     $('sX').textContent=ok(false);const rt=$('runTest');
@@ -1043,7 +1150,7 @@ function updBoard(){const sg=boardSig();if(sg!==bSig){bSig=sg;renderBoard();retu
 document.getElementById('board').addEventListener('toggle',e=>{if(e.target.id==='tdet')detOpen=e.target.open;if(e.target.classList&&e.target.classList.contains('odet'))oOpen[e.target.dataset.id]=e.target.open;},true);
 document.getElementById('board').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;const id=+(b.dataset.oacc||b.dataset.osm||b.dataset.oext||b.dataset.odec||b.dataset.red||(b.dataset.tnd||'').split(':')[0]||0);
   const f=S.offers.find(x=>x.id===id);
-  if(b.id==='runTest'){const o=S.order;if(o&&o.kind==='hotel'&&o.done>=o.need&&o.wait<=0&&o.stage!=='test'){o.stage='test';o.td=testDur();o.test=o.td;sfx('pop');}renderBoard();return;}
+  if(b.id==='runTest'){const o=S.order;if(o&&o.kind==='hotel'&&o.done>=o.need&&o.wait<=0&&o.stage!=='test'){o.stage='test';o.td=testDur();o.test=o.td;sfx('pop');drawScene();}renderBoard();return;}
   if(!f)return;
   if(b.dataset.osm&&f.dealer){f.q=Math.max(20,Math.ceil(f.q0*.25/10)*10,Math.round(f.q*.75/10)*10);calcOffer(f);sfx('pop');}
   else if(b.dataset.red){f.red=!f.red;sfx('pop');}
@@ -1120,9 +1227,9 @@ function tick(){const now=performance.now(),dt=Math.min(1,(now-lastT)/1000);last
   if(S.cmT>0){S.cmT-=dt;if(S.cmT<=0)S.costMul=1;}
   mkAcc+=dt;if(mkAcc>=2){mkTick(mkAcc);mkAcc=0;}
   if(S.bt>0){S.bt=Math.max(0,S.bt-dt);if(!S.bt)S.bx=1;}
-  orderTick(dt);
-  if(!$('bubble').classList.contains('on')){S.nextEvent-=dt;if(S.nextEvent<=0&&S.life>300&&!ordBusy()){if(S.life>20000&&Math.random()<.35&&BAD[Math.random()*BAD.length|0]()){}else{const se=STAFF_EV.filter(x=>S.emp[x[0]]);if(se.length&&Math.random()<.4){const x=se[Math.random()*se.length|0];say(x[1],x[2],x[3]);}else{const ev=EVENTS[Math.random()*EVENTS.length|0];say(ev.t,ev.b,ev.f);}}S.nextEvent=50+Math.random()*50;}}
-  else{bubbleTimer-=dt;if(bubbleTimer<=0){bubbleFn=null;const f2=bubbleFn2;bubbleFn2=null;$('bubble').classList.remove('on');if(f2)f2();}}
+  orderTick(dt);evTick(dt);
+  if(!$('bubble').classList.contains('on')){S.nextEvent-=dt;if(S.nextEvent<=0&&S.life>300&&!ordBusy()){if(S.emp[0]&&Math.random()<.25&&coffeeStart(false)){}else{const se=STAFF_EV.filter(x=>S.emp[x[0]]);if(se.length&&Math.random()<.4){const x=se[Math.random()*se.length|0];say(x[1],x[2],x[3]);}else{const ev=EVENTS[Math.random()*EVENTS.length|0];if(ev.run)ev.run();else say(ev.t,ev.b,ev.f);}}S.nextEvent=100+Math.random()*100;}}
+  else{bubbleTimer-=dt;if(bubbleTimer<=0)closeB();}
   const st=stageIdx();if(st>lastStage){lastStage=st;drawScene();modal('You are now a '+STAGES[st][1]+'!','Mr. Erol: "I told you so! I built this company. You helped a little too."','Hooray');}
   if(!gameOn){if(fairT>0){if(!ordBusy())fairT-=dt;if(fairT<=0){fairT=0;S.nextFair=150+Math.random()*90;}}else if(has('fair')){S.nextFair-=dt;if(S.nextFair<=0){fairT=25;sfx('badge');toast('The trade fair is open! Join below the factory.');}}}
   if(!gameOn&&has('mor')&&S.mor>50)S.mor=Math.max(50,S.mor-dt/45);
@@ -1134,7 +1241,8 @@ let RET=null;
 const RETQ=["While you were away I supervised the assembly. Well, I slept, but the assembly finished.","I kept your seat warm. And your coffee. I drank the coffee.","Nothing happened while you were away. Except everything. Look!","Welcome back! I told everyone you were in a very important meeting."];
 function retAdd(x){if(!RET)RET={b0:S.money,lines:[],sec:0};RET.lines.push(x);}
 function catchUp(){const sec=Math.min((S.emp[6]?24:8)*3600,(Date.now()-S.last)/1000);if(sec<10){S.last=Date.now();return;}
-  if(!RET)RET={b0:S.money,lines:[],sec:0};RET.sec=sec;let rem=sec;const r=rate(),o=S.order;
+  if(!RET)RET={b0:S.money,lines:[],sec:0};RET.sec=sec;let rem=sec;
+  if(S.lawT>0)S.lawT=Math.max(0,S.lawT-sec);if(S.rumor&&sec>300&&!S.offers.some(o=>o.kind==='hotel')&&!(S.order&&S.order.kind==='hotel')){const t=mkTender(false,false,S.rumor);S.rumor=null;S.offers.unshift(t);retAdd(LL('The tender Mr. Erol heard about is on the board: ','Erol Bey\'in duyduğu ihale panoda: ')+cityN(t.city));}if(S.trap)resolveTrap(true);if(sec>600&&S.emp[0]&&!S.cup&&Math.random()<.35){S.cup=1;S.cupT=180;}const r=rate(),o=S.order;
   const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);RET.lines.unshift('Away for '+(h?h+' h ':'')+m+' min');
   if(o){const need=Math.max(0,o.need-o.done),pt=r>0?need/r:Infinity;
     if(o.kind==='hotel'){
@@ -1149,7 +1257,7 @@ function catchUp(){const sec=Math.min((S.emp[6]?24:8)*3600,(Date.now()-S.last)/1
 function showReturn(){if(!RET||!RET.lines.length){RET=null;return;}const esc=x=>x.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const L=RET.lines.slice();L.push('Balance: '+fmtM(RET.b0)+' → '+fmtM(S.money));if(RET.sec)L.push('Mr. Erol: "'+RETQ[Math.random()*RETQ.length|0]+'"');
   modal(RET.sec?'Welcome back!':'Daily bonus','',RET.sec?'Back to the factory':'Collect','<div class="rl">'+L.map(x=>'<div>'+esc(x)+'</div>').join('')+'</div>');RET=null;}
-document.addEventListener('visibilitychange',()=>{if(document.hidden)save();else{catchUp();daily();showReturn();updateUI();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&bchoice)closeB();if(document.hidden)save();else{catchUp();daily();showReturn();updateUI();}});
 window.addEventListener('pagehide',save);
 
 let resetArm=false;
