@@ -198,6 +198,7 @@ html,body{overscroll-behavior:none}html{touch-action:manipulation;-webkit-text-s
 .scene #bg{z-index:0}.scene #svg{z-index:1}
 .scene>.bubble,.scene>.float,.scene>.boostTag{z-index:4}
 .mapSvg{width:100%;height:auto;display:block;border-radius:14px}.mapSvg .pl{transform-box:fill-box;transform-origin:center;animation:mpl 1.4s ease-in-out infinite}@keyframes mpl{50%{transform:scale(1.35)}}.abroad{border:2px solid #00a386}
+.rumb{border:2px dashed #ffd23d}.rumb .rq{margin:0;font-style:italic;color:var(--ink)}
 .nxt{display:flex;align-items:center;gap:8px;position:relative;overflow:hidden;width:100%;min-height:44px;padding:8px 12px;border:0;border-radius:14px;background:var(--card);color:var(--ink);box-shadow:0 3px 0 var(--line);font:700 14px Nunito,system-ui,sans-serif;text-align:left;cursor:pointer}
 .nxt .nxI{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#00a386;color:#fff;font-size:12px}
 .nxt .nxT{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -267,6 +268,7 @@ html,body{overscroll-behavior:none}html{touch-action:manipulation;-webkit-text-s
   <div class="board sec-o" id="board"><div class="bh"><b>Orders</b><span class="sm" id="refs"></span></div><div id="active"></div><div id="offers"></div></div>
 
   <div class="board sec-o" id="mapBox" style="display:none"><div class="bh"><b id="mapT"></b><span class="sm" id="mapSum"></span></div><svg viewBox="0 0 340 200" id="mapSvg" class="mapSvg"></svg><p class="note" id="mapNote" style="text-align:left"></p></div>
+  <div class="board sec-o rumb" id="rumBox" style="display:none"></div>
   <div class="board sec-o abroad" id="abroad" style="display:none"><div class="bh"><b id="abT"></b></div><p class="note" id="abP" style="text-align:left"></p><button id="abB"></button></div>
 
   <details class="tasks box2 sec-o" id="tasksBox" style="display:none">
@@ -823,8 +825,12 @@ let prevNT=0;
 function rumorTick(){const nt=S.nextTender,cross=prevNT>=240&&nt<240;prevNT=nt;if(!cross||S.rumor||!S.tenderShown||stageIdx()<1||Math.random()<.5)return;
   if(S.offers.some(o=>o.kind==='hotel')||(S.order&&S.order.kind==='hotel')||document.hidden||$('bubble').classList.contains('on')||$('modal').classList.contains('on')||S.skyIntro)return;
   const st=stageIdx(),ks=Object.keys(TT).filter(x=>TT[x].st<=Math.max(1,st)&&x!==S.lastTT),tt=ks[Math.random()*ks.length|0]||'hotel',m=S.map||[],fr=CITY.map((_,i)=>i).filter(i=>!m.includes(i)),pool=fr.length?fr:CITY.map((_,i)=>i),city=pool[Math.random()*pool.length|0];
-  S.rumor={tt,city};mapSig='';const j=RUMJ[Math.random()*RUMJ.length|0],f=(x,l)=>x.split('{t}').join(TTN[tt][l]).split('{c}').join(cityN(city));
-  say(LL('Mr. Erol: "'+f(j[0],0)+'"','Erol Bey: "'+f(j[1],1)+'"'),LL('Noted','Not aldım'),null);save();}
+  const ji=Math.random()*RUMJ.length|0;S.rumor={tt,city,j:ji};mapSig='';rumSig='';
+  say(LL('Mr. Erol: "'+rumTxt(S.rumor,0)+'"','Erol Bey: "'+rumTxt(S.rumor,1)+'"'),LL('Noted','Not aldım'),null);save();}
+function rumTxt(r,l){const j=RUMJ[r.j||0]||RUMJ[0];return j[l].split('{t}').join(TTN[r.tt]?TTN[r.tt][l]:'').split('{c}').join(cityN(r.city));}
+let rumSig='';
+function rumUI(){const b=$('rumBox'),r=S.rumor;if(!r||!TT[r.tt]){b.style.display='none';rumSig='';return;}b.style.display='';const sig=[r.tt,r.city,r.j,LANG].join('|');if(sig===rumSig)return;rumSig=sig;const l=LANG==='tr'?1:0;
+  b.innerHTML=`<div class="bh"><b>👂 ${LL('Tea room gossip','Çay ocağı dedikodusu')}</b><span class="sm">${TT[r.tt].ic} 📍 ${cityN(r.city)}</span></div><p class="note rq" style="text-align:left">${LL('Mr. Erol','Erol Bey')}: "${rumTxt(r,l)}"</p><p class="note" style="text-align:left">${LL('It will show up on the board on its own. Nothing to do, just a heads-up.','Kendiliğinden panoya düşecek. Yapman gereken bir şey yok, sadece haberin olsun.')}</p>`;}
 function evTick(dt){rumorTick();
   {const o=S.order;if(o&&o.kind==='hotel'&&o.stage==='test'){const n=document.getElementById('tbN');if(n)n.setAttribute('transform','rotate('+(-130+190*Math.min(1,1-o.test/(o.td||1))).toFixed(1)+')');}}
   if(!document.hidden){if(S.spyT==null)S.spyT=1200+Math.random()*600;if(S.life>20000)S.spyT-=dt;
@@ -1233,7 +1239,7 @@ function tick(){const now=performance.now(),dt=Math.min(1,(now-lastT)/1000);last
   const st=stageIdx();if(st>lastStage){lastStage=st;drawScene();modal('You are now a '+STAGES[st][1]+'!','Mr. Erol: "I told you so! I built this company. You helped a little too."','Hooray');}
   if(!gameOn){if(fairT>0){if(!ordBusy())fairT-=dt;if(fairT<=0){fairT=0;S.nextFair=150+Math.random()*90;}}else if(has('fair')){S.nextFair-=dt;if(S.nextFair<=0){fairT=25;sfx('badge');toast('The trade fair is open! Join below the factory.');}}}
   if(!gameOn&&has('mor')&&S.mor>50)S.mor=Math.max(50,S.mor-dt/45);
-  fairUI();achAcc+=dt;if(achAcc>.9){if(tod()!==$('scene').dataset.tod)drawScene();if(tab==='d'&&ordBusy()){pvAcc=(pvAcc||0)+1;if(pvAcc%2===0)renderList();}checkStory();morUI();updateTasks();unlocks(true);navUI();nxtUI();mapUI();abroadUI();}if(achAcc>1){achAcc=0;checkAch();}
+  fairUI();achAcc+=dt;if(achAcc>.9){if(tod()!==$('scene').dataset.tod)drawScene();if(tab==='d'&&ordBusy()){pvAcc=(pvAcc||0)+1;if(pvAcc%2===0)renderList();}checkStory();morUI();updateTasks();unlocks(true);navUI();nxtUI();mapUI();abroadUI();rumUI();}if(achAcc>1){achAcc=0;checkAch();}
   updateUI();saveAcc+=dt;if(saveAcc>5){saveAcc=0;save();}}
 
 let noSave=false;function save(){if(noSave)return;S.last=Date.now();store.set('pompaFab',JSON.stringify(S));}
